@@ -1,43 +1,33 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const { WebcastPushConnection } = require('tiktok-live-connector');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-let tiktokConnection = null;
+// Servim fișierele statice din folderul public
+app.use(express.static('public'));
 
 io.on('connection', (socket) => {
-    console.log('Utilizator conectat!');
+    console.log('Un utilizator s-a conectat:', socket.id);
 
-    socket.on('connect_tiktok', (username) => {
-        if (tiktokConnection) {
-            tiktokConnection.disconnect();
-        }
+    // Trimitem o întrebare de test când cineva apasă un buton
+    socket.on('request-question', () => {
+        const sampleQuestion = {
+            question: "Care este capitala României?",
+            answers: ["Cluj-Napoca", "București", "Timișoara", "Iași"],
+            correct: 1
+        };
+        io.emit('new-question', sampleQuestion);
+    });
 
-        const cleanUsername = username.replace('@', '').trim();
-        tiktokConnection = new WebcastPushConnection(cleanUsername);
-
-        tiktokConnection.connect().then(state => {
-            socket.emit('tiktok_status', { connected: true, msg: `Conectat la @${cleanUsername}!` });
-        }).catch(err => {
-            socket.emit('tiktok_status', { connected: false, msg: `Eroare: Asigură-te că @${cleanUsername} este LIVE!` });
-        });
-
-        tiktokConnection.on('chat', data => {
-            io.emit('tiktok_chat', {
-                user: data.uniqueId,
-                nickname: data.nickname,
-                comment: data.comment.trim()
-            });
-        });
+    socket.on('disconnect', () => {
+        console.log('Utilizator deconectat:', socket.id);
     });
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server pornit pe portul ${PORT}`));
+server.listen(PORT, () => {
+    console.log(`Serverul rulează pe portul ${PORT}`);
+});
