@@ -13,13 +13,10 @@ let tiktokConnection = null;
 let currentUsername = '';
 
 io.on('connection', (socket) => {
-    console.log('Client conectat:', socket.id);
-
     if (currentUsername) {
         socket.emit('status-update', { connected: true, username: currentUsername });
     }
 
-    // Conectare la un cont de TikTok Live
     socket.on('connect-tiktok', (username) => {
         const cleanUser = username.replace('@', '').trim();
         if (!cleanUser) return;
@@ -31,68 +28,43 @@ io.on('connection', (socket) => {
         currentUsername = cleanUser;
         tiktokConnection = new WebcastPushConnection(cleanUser, {
             processInitialData: false,
-            enableExtendedGiftInfo: true
+            enableExtendedGiftInfo: false
         });
 
         tiktokConnection.connect()
             .then(state => {
-                console.log(`Conectat la live-ul lui ${cleanUser} (Room ID: ${state.roomId})`);
                 io.emit('status-update', { connected: true, username: cleanUser });
             })
             .catch(err => {
-                console.error('Eroare conectare TikTok:', err.message);
                 io.emit('status-update', { 
                     connected: false, 
-                    error: 'Nu ești LIVE acum sau userul nu a fost găsit. Folosește butoanele de test!' 
+                    error: 'Nu s-a putut conecta la TikTok (jocul rulează automat).' 
                 });
             });
 
-        // 1. Comentariu -> Intră în cursă sau primește un mic impuls
+        // Ascultăm comentariile (1, 2, 3, 4 sau A, B, C, D)
         tiktokConnection.on('chat', (data) => {
-            io.emit('race-action', {
-                userId: data.uniqueId,
-                nickname: data.nickname || data.uniqueId,
-                avatar: data.profilePictureUrl,
-                type: 'chat',
-                boost: 5,
-                detail: data.comment
-            });
-        });
+            const msg = (data.comment || '').trim().toUpperCase();
+            let answerIndex = -1;
 
-        // 2. Like (Tap-tap) -> Impuls constant
-        tiktokConnection.on('like', (data) => {
-            io.emit('race-action', {
-                userId: data.uniqueId,
-                nickname: data.nickname || data.uniqueId,
-                avatar: data.profilePictureUrl,
-                type: 'like',
-                boost: Math.min(data.likeCount || 1, 10),
-                detail: `${data.likeCount} like-uri`
-            });
-        });
+            if (msg === '1' || msg === 'A') answerIndex = 0;
+            else if (msg === '2' || msg === 'B') answerIndex = 1;
+            else if (msg === '3' || msg === 'C') answerIndex = 2;
+            else if (msg === '4' || msg === 'D') answerIndex = 3;
 
-        // 3. Cadouri (Trandafir etc.) -> Super Turbo!
-        tiktokConnection.on('gift', (data) => {
-            // Așteptăm finalul seriei de cadouri (streak) sau luăm fiecare bucată
-            if (data.giftType === 1 && !data.repeatEnd) return;
-
-            const coins = (data.diamondCount || 1) * (data.repeatCount || 1);
-            const boostAmount = 15 + (coins * 10); // Trandafirul (1 coin) = +25 pași!
-
-            io.emit('race-action', {
-                userId: data.uniqueId,
-                nickname: data.nickname || data.uniqueId,
-                avatar: data.profilePictureUrl,
-                type: 'gift',
-                boost: boostAmount,
-                giftName: data.giftName || 'Cadou',
-                coins: coins
-            });
+            if (answerIndex !== -1) {
+                io.emit('player-answer', {
+                    userId: data.uniqueId,
+                    nickname: data.nickname || data.uniqueId,
+                    avatar: data.profilePictureUrl,
+                    answerIndex: answerIndex
+                });
+            }
         });
     });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Serverul rulează pe portul ${PORT}`);
+    console.log(`Serverul Milionar rulează pe portul ${PORT}`);
 });
