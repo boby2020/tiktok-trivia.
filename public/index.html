@@ -2,130 +2,86 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultimul în Picioare - Live Trivia (Mod Offline/Test)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Trivia Live</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: #0b0e17; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .top-bar { background: #151a2d; padding: 12px; text-align: center; border-bottom: 1px solid #2a3254; font-size: 14px; font-weight: bold; color: #25f4ee; }
-        .game-area { flex: 1; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
-        .stats-row { display: flex; justify-content: space-between; align-items: center; }
-        .badge { background: #1e2642; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid #38467a; }
-        .timer { width: 55px; height: 55px; border-radius: 50%; border: 4px solid #25f4ee; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; }
-        .question-box { background: linear-gradient(135deg, #1b223c, #121729); padding: 18px; border-radius: 16px; border: 1px solid #33406e; text-align: center; margin: 10px 0; }
-        .question-box h2 { font-size: 18px; line-height: 1.4; }
-        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .opt { background: #192038; border: 2px solid #2e3a63; padding: 14px 10px; border-radius: 12px; font-size: 15px; font-weight: bold; display: flex; justify-content: space-between; }
-        .opt.correct { background: #134e2a; border-color: #2ecc71; }
-        .opt span.letter { color: #25f4ee; margin-right: 6px; }
-        .chat-box { height: 150px; background: rgba(0,0,0,0.4); border-top: 1px solid #222a47; padding: 8px 12px; overflow-y: auto; font-size: 13px; }
-        .chat-msg { margin-bottom: 5px; }
-        .chat-msg strong { color: #25f4ee; }
-        .controls { display: flex; gap: 8px; padding: 10px; background: #111626; }
-        .controls button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; font-size: 14px; color: #fff; cursor: pointer; }
-        .btn-next { background: #2ecc71; color: #000 !important; }
-        .btn-revin { background: #f39c12; color: #000 !important; }
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f0f1a;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        h1 { color: #ff0050; }
+        .question { font-size: 22px; margin: 20px 0; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        button {
+            background: #00f2fe;
+            border: none;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #000;
+            transition: 0.2s;
+        }
+        button:hover { background: #4facfe; color: #fff; }
+        #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
-
-    <div class="top-bar">Mod Test / Previzualizare Directă pe Telefon</div>
-
-    <div class="game-area">
-        <div class="stats-row">
-            <div class="badge">ÎN JOC: <span id="aliveCount">12</span></div>
-            <div class="timer" id="timer">10</div>
-            <div class="badge">RUNDA <span id="roundNum">1</span></div>
+    <div class="container">
+        <h1>TikTok Trivia Live 🎮</h1>
+        <div id="question-container">
+            <p class="question" id="question-text">Se încarcă întrebarea...</p>
+            <div class="options" id="options-container"></div>
         </div>
-
-        <div class="question-box">
-            <h2 id="questionText">Apasă „Întrebare Nouă” pentru a începe runda!</h2>
-        </div>
-
-        <div class="options" id="optionsGrid">
-            <div class="opt" id="optA"><div><span class="letter">A</span> <span id="txtA">-</span></div><span id="pctA">0%</span></div>
-            <div class="opt" id="optB"><div><span class="letter">B</span> <span id="txtB">-</span></div><span id="pctB">0%</span></div>
-            <div class="opt" id="optC"><div><span class="letter">C</span> <span id="txtC">-</span></div><span id="pctC">0%</span></div>
-            <div class="opt" id="optD"><div><span class="letter">D</span> <span id="txtD">-</span></div><span id="pctD">0%</span></div>
-        </div>
+        <div id="result"></div>
     </div>
 
-    <div class="chat-box" id="chatBox">
-        <div class="chat-msg"><strong>SISTEM:</strong> Aplicația este gata! Poți testa interfața direct în Acode.</div>
-    </div>
-
-    <div class="controls">
-        <button class="btn-next" onclick="startRound()">Întrebare Nouă</button>
-        <button class="btn-revin" onclick="startRevin()">Rundă REVIN</button>
-    </div>
-
+    <!-- Scriptul Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        const questions = [
-            { q: "Care oraș a fost Capitală Europeană a Culturii în 2007, împreună cu Luxemburg?", A: "Sibiu", B: "Brașov", C: "Timișoara", D: "Cluj-Napoca", ans: "A" },
-            { q: "Care este cel mai lung fluviu din Europa?", A: "Dunărea", B: "Volga", C: "Rin", D: "Nipru", ans: "B" },
-            { q: "În ce an a avut loc Marea Unire de la Alba Iulia?", A: "1859", B: "1914", C: "1918", D: "1920", ans: "C" },
-            { q: "Care este elementul chimic cu simbolul Au?", A: "Argint", B: "Aluminiu", C: "Argon", D: "Aur", ans: "D" }
-        ];
+        const socket = io();
 
-        let currentQIndex = -1;
-        let timeLeft = 10;
-        let timerInterval = null;
-        let aliveCount = 25;
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const resultDiv = document.getElementById('result');
 
-        function startRound() {
-            clearInterval(timerInterval);
-            currentQIndex = (currentQIndex + 1) % questions.length;
-            const q = questions[currentQIndex];
+        socket.on('new-question', (q) => {
+            resultDiv.textContent = '';
+            questionText.textContent = q.question;
+            optionsContainer.innerHTML = '';
 
-            document.getElementById('roundNum').innerText = currentQIndex + 1;
-            document.getElementById('questionText').innerText = q.q;
-            
-            ['A', 'B', 'C', 'D'].forEach(l => {
-                document.getElementById('txt' + l).innerText = q[l];
-                document.getElementById('pct' + l).innerText = Math.floor(Math.random() * 40) + '%';
-                document.getElementById('opt' + l).classList.remove('correct');
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.textContent = option;
+                btn.onclick = () => {
+                    socket.emit('submit-answer', { optionIndex: index });
+                };
+                optionsContainer.appendChild(btn);
             });
+        });
 
-            timeLeft = 10;
-            document.getElementById('timer').innerText = timeLeft;
-
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    const correctAns = q.ans;
-                    document.getElementById('opt' + correctAns).classList.add('correct');
-                    aliveCount = Math.max(1, aliveCount - Math.floor(Math.random() * 5));
-                    document.getElementById('aliveCount').innerText = aliveCount;
-                    addChat("SISTEM", `Răspuns corect: ${correctAns}. Runda s-a încheiat!`);
-                }
-            }, 1000);
-        }
-
-        function startRevin() {
-            clearInterval(timerInterval);
-            document.getElementById('questionText').innerText = "RUNDĂ REVIN: Cine scrie în chat revine în joc!";
-            timeLeft = 10;
-            document.getElementById('timer').innerText = timeLeft;
-
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timer').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    aliveCount += 3;
-                    document.getElementById('aliveCount').innerText = aliveCount;
-                    addChat("SISTEM", "3 jucători au fost readuși în joc!");
-                }
-            }, 1000);
-        }
-
-        function addChat(user, text) {
-            const box = document.getElementById('chatBox');
-            box.innerHTML += `<div class="chat-msg"><strong>${user}:</strong> ${text}</div>`;
-            box.scrollTop = box.scrollHeight;
-        }
+        socket.on('answer-result', (data) => {
+            if (data.correct) {
+                resultDiv.style.color = '#00ffcc';
+                resultDiv.textContent = 'Felicitări! Răspuns corect! 🎉';
+            } else {
+                resultDiv.style.color = '#ff4d4d';
+                resultDiv.textContent = 'Ai greșit! Încearcă data viitoare. ❌';
+            }
+        });
     </script>
 </body>
 </html>
