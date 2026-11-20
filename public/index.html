@@ -3,453 +3,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TikTok Horse Race Live</title>
+    <title>Vrei să fii Milionar? - TikTok Live</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #090d16 0%, #161b2e 100%);
+            background: radial-gradient(circle at top, #1e1b4b 0%, #090a1a 100%);
             color: #fff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden;
-        }
-        .header {
-            width: 100%;
-            max-width: 520px;
-            background: rgba(255, 255, 255, 0.05);
             padding: 12px;
-            border-bottom: 2px solid #ff0050;
-            text-align: center;
         }
-        .header h1 {
-            font-size: 22px;
-            background: linear-gradient(90deg, #00f2fe, #ff0050);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .connect-bar {
+        .top-bar {
+            width: 100%;
+            max-width: 500px;
             display: flex;
             gap: 6px;
-            margin-top: 8px;
             justify-content: center;
+            margin-bottom: 8px;
         }
-        .connect-bar input {
+        .top-bar input {
             padding: 8px 12px;
             border-radius: 8px;
-            border: 1px solid #334155;
+            border: 1px solid #f59e0b;
             background: #0f172a;
             color: #fff;
             font-size: 14px;
-            width: 170px;
+            width: 160px;
         }
         .btn {
-            padding: 8px 14px;
+            padding: 8px 12px;
             border: none;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             font-size: 13px;
-            transition: transform 0.1s, opacity 0.2s;
         }
-        .btn:active { transform: scale(0.95); }
-        .btn-live { background: #ff0050; color: #fff; }
-        .btn-sound { background: #00f2fe; color: #000; }
-        .status-msg {
+        .btn-connect { background: #f59e0b; color: #000; }
+        .btn-sound { background: #38bdf8; color: #000; }
+        .status-text {
             font-size: 12px;
-            margin-top: 6px;
             color: #94a3b8;
-        }
-        .rules-banner {
-            width: 100%;
-            max-width: 520px;
-            background: linear-gradient(90deg, rgba(255,0,80,0.2), rgba(0,242,254,0.2));
-            padding: 8px;
+            margin-bottom: 12px;
             text-align: center;
-            font-size: 13px;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        /* Pista de curse */
-        .track-container {
-            width: 100%;
-            max-width: 520px;
-            flex: 1;
-            background: #1e293b;
-            position: relative;
-            padding: 15px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border-left: 2px solid #334155;
-            border-right: 2px solid #334155;
-        }
-        .finish-line {
-            position: absolute;
-            right: 42px;
-            top: 0;
-            bottom: 0;
-            width: 10px;
-            background-image: repeating-linear-gradient(
-                0deg,
-                #fff,
-                #fff 10px,
-                #000 10px,
-                #000 20px
-            );
-            z-index: 1;
-            box-shadow: 0 0 15px rgba(255,255,255,0.4);
-        }
-        .lane {
-            background: linear-gradient(90deg, #166534 0%, #15803d 100%);
-            border: 2px dashed rgba(255,255,255,0.35);
-            border-radius: 12px;
-            height: 64px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            padding: 0 8px;
-            overflow: hidden;
-        }
-        .lane-number {
-            position: absolute;
-            left: 10px;
+        .logo {
             font-size: 24px;
             font-weight: 900;
-            color: rgba(255,255,255,0.15);
-            pointer-events: none;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fde047, #f59e0b, #fde047);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
-        .racer {
-            position: absolute;
-            left: 5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-            z-index: 2;
-        }
-        .racer-info {
-            background: rgba(0, 0, 0, 0.75);
-            padding: 3px 8px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            border: 1px solid #00f2fe;
-            white-space: nowrap;
-        }
-        .racer-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #ff0050;
-        }
-        .racer-name {
-            font-size: 12px;
-            font-weight: bold;
-            max-width: 75px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .horse-icon {
-            font-size: 32px;
-            transform: scaleX(-1); /* Întoarcem calul spre dreapta (linia de sosire) */
-            display: inline-block;
-            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.6));
-        }
-        .gallop {
-            animation: bounce 0.3s infinite alternate;
-        }
-        @keyframes bounce {
-            from { transform: scaleX(-1) translateY(0px) rotate(0deg); }
-            to { transform: scaleX(-1) translateY(-5px) rotate(-6deg); }
-        }
-        .boost-badge {
-            position: absolute;
-            top: -16px;
-            right: 0;
-            background: #facc15;
-            color: #000;
-            font-size: 10px;
-            font-weight: 900;
-            padding: 1px 6px;
-            border-radius: 8px;
-            animation: pop 0.5s ease-out;
-        }
-        @keyframes pop {
-            0% { transform: scale(0.5); opacity: 0; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        /* Banner câștigător */
-        .winner-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 50;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-        }
-        .winner-card {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 3px solid #facc15;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 360px;
-            box-shadow: 0 0 40px rgba(250, 204, 21, 0.5);
-        }
-        .winner-card h2 { color: #facc15; font-size: 28px; margin-bottom: 10px; }
-        .winner-card img {
-            width: 80px; height: 80px; border-radius: 50%;
-            border: 3px solid #00f2fe; margin: 10px 0;
-        }
-        /* Panou de test */
-        .test-panel {
+        /* Bara de timp */
+        .timer-wrapper {
             width: 100%;
-            max-width: 520px;
-            background: #0f172a;
-            padding: 10px;
-            border-top: 1px solid #334155;
+            max-width: 500px;
+            background: #1e293b;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 14px;
+            border: 1px solid #475569;
+        }
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+            transition: width 0.2s linear;
+        }
+        /* Cutia cu întrebarea */
+        .question-box {
+            width: 100%;
+            max-width: 500px;
+            background: linear-gradient(180deg, #1e3a8a 0%, #172554 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            font-size: 19px;
+            font-weight: bold;
+            box-shadow: 0 0 25px rgba(30, 58, 138, 0.8);
+            margin-bottom: 16px;
+            min-height: 95px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+            align-items: center;
             justify-content: center;
         }
-        .btn-test { background: #334155; color: #fff; font-size: 11px; padding: 6px 10px; }
-        .btn-gift { background: #eab308; color: #000; font-size: 11px; padding: 6px 10px; }
+        /* Variantele de răspuns */
+        .options-grid {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-btn {
+            background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .option-btn:hover { border-color: #f59e0b; }
+        .option-label {
+            color: #f59e0b;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        .option-votes {
+            font-size: 12px;
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #cbd5e1;
+        }
+        .option-correct {
+            background: linear-gradient(90deg, #15803d 0%, #166534 100%) !important;
+            border-color: #4ade80 !important;
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.6);
+            transform: scale(1.02);
+        }
+        .option-wrong {
+            opacity: 0.45;
+        }
+        /* Banner anunț câștigător rundă */
+        .round-banner {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 14px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid #f59e0b;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fde047;
+            min-height: 42px;
+        }
+        /* Clasament Live */
+        .leaderboard {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 14px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .leaderboard h3 {
+            font-size: 14px;
+            color: #38bdf8;
+            margin-bottom: 8px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .leader-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 14px;
+        }
+        .leader-row:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>🏇 Cursa de Cai Live 🏆</h1>
-        <div class="connect-bar">
-            <input type="text" id="tiktokUser" placeholder="User TikTok (ex: bobby2020)" value="bobby2020">
-            <button class="btn btn-live" onclick="connectLive()">Conectează</button>
-            <button class="btn btn-sound" id="soundBtn" onclick="enableAudio()">🔊 Activează Vocea</button>
-        </div>
-        <div class="status-msg" id="statusMsg">Apasă „Activează Vocea” pentru comentator audio!</div>
+    <div class="top-bar">
+        <input type="text" id="tiktokUser" value="eusebiusebisebi" placeholder="User TikTok">
+        <button class="btn btn-connect" onclick="connectLive()">Conectează</button>
+        <button class="btn btn-sound" id="soundBtn" onclick="enableAudio()">🔊 Activează Vocea</button>
+    </div>
+    <div class="status-text" id="statusText">Scrie A, B, C, D sau 1, 2, 3, 4 în chat-ul TikTok!</div>
+
+    <div class="logo">💎 Vrei să fii Milionar? 💎</div>
+
+    <div class="timer-wrapper">
+        <div class="timer-bar" id="timerBar"></div>
     </div>
 
-    <div class="rules-banner">
-        💬 Scrie în chat = Intri în cursă | ❤️ Like = Viteză | 🌹 Trandafir = SUPER TURBO!
-    </div>
+    <div class="question-box" id="questionBox">Se încarcă întrebarea...</div>
 
-    <div class="track-container" id="track">
-        <div class="finish-line"></div>
-        <!-- Culoarele se generează automat -->
-    </div>
+    <div class="options-grid" id="optionsGrid"></div>
 
-    <div class="test-panel">
-        <button class="btn btn-test" onclick="simulate('Andrei', 'like', 4)">Test: Andrei (Like ❤️)</button>
-        <button class="btn btn-gift" onclick="simulate('Daniel', 'gift', 25, 'Trandafir')">Test: Daniel (Trandafir 🌹)</button>
-        <button class="btn btn-test" onclick="simulate('Vasilică', 'like', 6)">Test: Vasilică (Like ❤️)</button>
-        <button class="btn btn-live" onclick="resetRace()">🔄 Cursă Nouă</button>
-    </div>
+    <div class="round-banner" id="roundBanner">Așteptăm răspunsurile voastre în comentarii!</div>
 
-    <div class="winner-overlay" id="winnerOverlay">
-        <div class="winner-card">
-            <h2>🏆 CÂȘTIGĂTOR! 🏆</h2>
-            <img id="winnerAvatar" src="" alt="Avatar">
-            <h3 id="winnerName" style="font-size: 24px; color: #00f2fe;">Nume</h3>
-            <p style="margin-top: 10px; color: #cbd5e1;">Următoarea cursă începe în câteva secunde...</p>
+    <div class="leaderboard">
+        <h3>🏆 Clasament Jucători Live</h3>
+        <div id="leaderList">
+            <div style="text-align:center; color:#64748b; font-size:13px;">Încă nu sunt puncte. Răspunde primul!</div>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        const track = document.getElementById('track');
-        const statusMsg = document.getElementById('statusMsg');
-        const winnerOverlay = document.getElementById('winnerOverlay');
+        const questions = [
+            { q: "Care este cel mai lung fluviu din Europa?", opts: ["Dunărea", "Volga", "Rin", "Nipru"], ans: 1 },
+            { q: "În ce an a avut loc Marea Unire de la Alba Iulia?", opts: ["1859", "1918", "1945", "1989"], ans: 1 },
+            { q: "Care este cel mai înalt vârf muntos din România?", opts: ["Omu", "Negoiu", "Moldoveanu", "Parângul Mare"], ans: 2 },
+            { q: "Câte planete are Sistemul Solar?", opts: ["7", "8", "9", "10"], ans: 1 },
+            { q: "Cine a scris poezia „Luceafărul”?", opts: ["Ion Creangă", "Mihai Eminescu", "George Coșbuc", "Tudor Arghezi"], ans: 1 },
+            { q: "Care este capitala Italiei?", opts: ["Milano", "Veneția", "Roma", "Napoli"], ans: 2 },
+            { q: "Ce element chimic are simbolul „Au”?", opts: ["Argint", "Aluminiu", "Aur", "Argon"], ans: 2 },
+            { q: "Câte zile are un an bisect?", opts: ["364", "365", "366", "367"], ans: 2 },
+            { q: "Care este cel mai mare ocean de pe Pământ?", opts: ["Atlantic", "Indian", "Arctic", "Pacific"], ans: 3 },
+            { q: "Cine a pictat celebra operă „Mona Lisa”?", opts: ["Pablo Picasso", "Leonardo da Vinci", "Vincent van Gogh", "Michelangelo"], ans: 1 },
+            { q: "În ce oraș se află Turnul Eiffel?", opts: ["Londra", "Madrid", "Paris", "Berlin"], ans: 2 },
+            { q: "Care este moneda oficială a Marii Britanii?", opts: ["Euro", "Dolar", "Liră sterlină", "Franc"], ans: 2 },
+            { q: "Câte continente există pe Pământ?", opts: ["5", "6", "7", "8"], ans: 2 },
+            { q: "Ce animal este supranumit „Regele Junglei”?", opts: ["Tigrul", "Leul", "Elefantul", "Ghepardul"], ans: 1 },
+            { q: "Care este cea mai apropiată planetă de Soare?", opts: ["Venus", "Marte", "Mercur", "Pământ"], ans: 2 }
+        ];
 
-        const MAX_LANES = 6;
-        const FINISH_PERCENT = 76; // Unde se oprește calul la linia de finish
-        let racers = {}; // userId -> { laneIndex, progress, nickname, avatar, element }
-        let raceActive = true;
+        const letters = ["A", "B", "C", "D"];
+        let currentIdx = 0;
+        let roundOpen = true;
+        let timeLeft = 18;
+        const ROUND_SECONDS = 18;
         let audioEnabled = false;
-        let lastSpokenTime = 0;
+        let scores = {}; // userId -> { nickname, points }
+        let roundAnswers = {}; // userId -> { nickname, answerIndex }
 
-        // Creăm cele 6 culoare goale
-        function initTrack() {
-            track.innerHTML = '<div class="finish-line"></div>';
-            for (let i = 0; i < MAX_LANES; i++) {
-                const lane = document.createElement('div');
-                lane.className = 'lane';
-                lane.id = `lane-${i}`;
-                lane.innerHTML = `<span class="lane-number">${i + 1}</span>`;
-                track.appendChild(lane);
-            }
-        }
-        initTrack();
-
-        // Activare sintetizator vocal (TTS)
         function enableAudio() {
             audioEnabled = true;
-            document.getElementById('soundBtn').textContent = '🔊 Voce Activă';
-            document.getElementById('soundBtn').style.background = '#22c55e';
-            speak("Comentatorul este pregătit! Să înceapă cursa de cai!", true);
+            const btn = document.getElementById('soundBtn');
+            btn.textContent = '🔊 Voce Activă';
+            btn.style.background = '#22c55e';
+            speak("Bun venit la Vrei să fii milionar! Scrieți A, B, C sau D în comentarii!");
         }
 
-        function speak(text, force = false) {
+        function speak(text) {
             if (!audioEnabled) return;
-            const now = Date.now();
-            if (!force && now - lastSpokenTime < 2800) return; // Evităm suprapunerea vocilor
-            lastSpokenTime = now;
-
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ro-RO';
-            utterance.rate = 1.08;
-            utterance.pitch = 1.05;
-            window.speechSynthesis.speak(utterance);
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'ro-RO';
+            u.rate = 1.05;
+            window.speechSynthesis.speak(u);
         }
 
         function connectLive() {
             const user = document.getElementById('tiktokUser').value.trim();
             if (!user) return;
-            statusMsg.textContent = `Se conectează la @${user}...`;
+            document.getElementById('statusText').textContent = `Se conectează la @${user}...`;
             socket.emit('connect-tiktok', user);
         }
 
         socket.on('status-update', (data) => {
+            const st = document.getElementById('statusText');
             if (data.connected) {
-                statusMsg.style.color = '#4ade80';
-                statusMsg.textContent = `🟢 Conectat LIVE la @${data.username}`;
-                speak(`Conectat la live-ul lui ${data.username}. Scrieți în chat ca să intrați în cursă!`, true);
+                st.style.color = '#4ade80';
+                st.textContent = `🟢 Conectat LIVE la @${data.username}`;
             } else {
-                statusMsg.style.color = '#f87171';
-                statusMsg.textContent = `🔴 ${data.error}`;
+                st.style.color = '#fbbf24';
+                st.textContent = `🟡 ${data.error}`;
             }
         });
 
-        socket.on('race-action', (data) => {
-            handleAction(data);
+        socket.on('player-answer', (data) => {
+            registerAnswer(data.userId, data.nickname, data.answerIndex);
         });
 
-        function handleAction(data) {
-            if (!raceActive) return;
+        function registerAnswer(userId, nickname, answerIndex) {
+            if (!roundOpen) return;
+            roundAnswers[userId] = { nickname, answerIndex };
+            updateVoteCounts();
+            document.getElementById('roundBanner').textContent = `💬 ${nickname} a ales varianta ${letters[answerIndex]}!`;
+        }
 
-            let racer = racers[data.userId];
+        function updateVoteCounts() {
+            const counts = [0, 0, 0, 0];
+            Object.values(roundAnswers).forEach(a => counts[a.answerIndex]++);
+            for (let i = 0; i < 4; i++) {
+                const el = document.getElementById(`votes-${i}`);
+                if (el) el.textContent = `${counts[i]} voturi`;
+            }
+        }
 
-            // Dacă jucătorul nu e încă în cursă, îl adăugăm pe un culoar liber
-            if (!racer) {
-                const usedLanes = Object.values(racers).map(r => r.laneIndex);
-                let freeLane = -1;
-                for (let i = 0; i < MAX_LANES; i++) {
-                    if (!usedLanes.includes(i)) { freeLane = i; break; }
-                }
-                if (freeLane === -1) return; // Pista este plină (6 cai)
+        function loadQuestion() {
+            roundOpen = true;
+            roundAnswers = {};
+            timeLeft = ROUND_SECONDS;
+            const item = questions[currentIdx];
 
-                const avatarUrl = data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.nickname)}&background=ff0050&color=fff`;
-                const laneEl = document.getElementById(`lane-${freeLane}`);
+            document.getElementById('questionBox').textContent = item.q;
+            document.getElementById('roundBanner').textContent = "Scrie 1, 2, 3, 4 sau A, B, C, D în comentarii!";
 
-                const racerEl = document.createElement('div');
-                racerEl.className = 'racer';
-                racerEl.innerHTML = `
-                    <div class="racer-info">
-                        <img class="racer-avatar" src="${avatarUrl}" alt="">
-                        <span class="racer-name">${data.nickname}</span>
-                    </div>
-                    <span class="horse-icon gallop">🐎</span>
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+
+            item.opts.forEach((opt, idx) => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.id = `opt-${idx}`;
+                btn.onclick = () => registerAnswer('host', 'Gazda Live', idx);
+                btn.innerHTML = `
+                    <div><span class="option-label">${letters[idx]}:</span> ${opt}</div>
+                    <span class="option-votes" id="votes-${idx}">0 voturi</span>
                 `;
-                laneEl.appendChild(racerEl);
+                grid.appendChild(btn);
+            });
 
-                racer = {
-                    userId: data.userId,
-                    nickname: data.nickname,
-                    avatar: avatarUrl,
-                    laneIndex: freeLane,
-                    progress: 0,
-                    element: racerEl
-                };
-                racers[data.userId] = racer;
+            speak(`${item.q} ... A: ${item.opts[0]}. B: ${item.opts[1]}. C: ${item.opts[2]}. D: ${item.opts[3]}.`);
+        }
 
-                speak(`${data.nickname} a intrat în cursă!`);
+        function endRound() {
+            roundOpen = false;
+            const item = questions[currentIdx];
+            const correctIdx = item.ans;
+
+            for (let i = 0; i < 4; i++) {
+                const el = document.getElementById(`opt-${i}`);
+                if (i === correctIdx) el.classList.add('option-correct');
+                else el.classList.add('option-wrong');
             }
 
-            // Calculăm avansarea
-            const prevLeader = getLeader();
-            racer.progress = Math.min(100, racer.progress + data.boost);
-
-            // Actualizăm poziția vizuală
-            const visualLeft = (racer.progress / 100) * FINISH_PERCENT;
-            racer.element.style.left = `${visualLeft}%`;
-
-            // Afișăm insigna de boost la cadouri
-            if (data.type === 'gift') {
-                showBoostBadge(racer.element, `+${data.giftName || 'TURBO'}!`);
-                speak(`${data.nickname} a trimis ${data.giftName || 'un cadou'} și zboară pe pistă!`, true);
-            } else {
-                const newLeader = getLeader();
-                if (newLeader && prevLeader && newLeader.userId !== prevLeader.userId) {
-                    speak(`${newLeader.nickname} l-a întrecut pe ${prevLeader.nickname} și trece pe primul loc!`);
+            // Calculăm câștigătorii rundei
+            const winners = [];
+            Object.entries(roundAnswers).forEach(([uid, info]) => {
+                if (info.answerIndex === correctIdx) {
+                    winners.push(info.nickname);
+                    if (!scores[uid]) scores[uid] = { nickname: info.nickname, points: 0 };
+                    scores[uid].points += 10;
                 }
+            });
+
+            updateLeaderboard();
+
+            const correctText = `${letters[correctIdx]}, ${item.opts[correctIdx]}`;
+            if (winners.length > 0) {
+                const firstWinner = winners[0];
+                document.getElementById('roundBanner').textContent = `🎉 Corect: ${correctText}! Bravo ${winners.slice(0, 3).join(', ')}!`;
+                speak(`Timpul a expirat! Răspunsul corect este ${correctText}. Felicitări ${firstWinner}, ai câștigat 10 puncte!`);
+            } else {
+                document.getElementById('roundBanner').textContent = `✅ Răspunsul corect era: ${correctText}!`;
+                speak(`Timpul a expirat! Răspunsul corect este ${correctText}. Pregătiți-vă pentru următoarea întrebare!`);
             }
 
-            // Verificăm dacă a trecut linia de finish
-            if (racer.progress >= 100) {
-                finishRace(racer);
-            }
-        }
-
-        function showBoostBadge(racerEl, text) {
-            const old = racerEl.querySelector('.boost-badge');
-            if (old) old.remove();
-            const badge = document.createElement('div');
-            badge.className = 'boost-badge';
-            badge.textContent = text;
-            racerEl.appendChild(badge);
-            setTimeout(() => badge.remove(), 1500);
-        }
-
-        function getLeader() {
-            const list = Object.values(racers);
-            if (list.length === 0) return null;
-            return list.reduce((max, r) => r.progress > max.progress ? r : max, list[0]);
-        }
-
-        function finishRace(winner) {
-            raceActive = false;
-            document.getElementById('winnerAvatar').src = winner.avatar;
-            document.getElementById('winnerName').textContent = winner.nickname;
-            winnerOverlay.style.display = 'flex';
-
-            speak(`Stop cursă! Felicitări ${winner.nickname}, ai câștigat locul întâi!`, true);
-
-            // Repornește automat după 6 secunde
             setTimeout(() => {
-                resetRace();
+                currentIdx = (currentIdx + 1) % questions.length;
+                loadQuestion();
             }, 6000);
         }
 
-        function resetRace() {
-            racers = {};
-            raceActive = true;
-            winnerOverlay.style.display = 'none';
-            initTrack();
-            speak("Start la o nouă cursă! Dați like sau scrieți în chat ca să intrați!", true);
+        function updateLeaderboard() {
+            const list = Object.values(scores).sort((a, b) => b.points - a.points).slice(0, 5);
+            const container = document.getElementById('leaderList');
+            if (list.length === 0) return;
+
+            container.innerHTML = list.map((p, i) => `
+                <div class="leader-row">
+                    <span><strong>#${i + 1}</strong> ${p.nickname}</span>
+                    <span style="color:#fde047; font-weight:bold;">${p.points} pct</span>
+                </div>
+            `).join('');
         }
 
-        // Funcție pentru butoanele de test de jos
-        function simulate(name, type, boost, giftName = '') {
-            handleAction({
-                userId: name.toLowerCase(),
-                nickname: name,
-                type: type,
-                boost: boost,
-                giftName: giftName
-            });
-        }
+        // Bucla de timp (100ms)
+        setInterval(() => {
+            if (!roundOpen) return;
+            timeLeft -= 0.1;
+            const pct = Math.max(0, (timeLeft / ROUND_SECONDS) * 100);
+            document.getElementById('timerBar').style.width = `${pct}%`;
+
+            if (timeLeft <= 0) {
+                endRound();
+            }
+        }, 100);
+
+        // Pornim prima întrebare imediat
+        loadQuestion();
     </script>
 </body>
 </html>
