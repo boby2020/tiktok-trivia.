@@ -38,66 +38,53 @@ io.on('connection', (socket) => {
             .catch(() => {
                 io.emit('status-update', { 
                     connected: false, 
-                    error: 'TikTok blocat temporar (folosește butoanele Demo sau reîncearcă)' 
+                    error: 'TikTok blocat temporar (foloseștebutoanele de test)' 
                 });
             });
 
-        // 1. Intrarea în live (Member Join)
+        // 1. Cine intră sau comentează devine glob/cadou în brad
         tiktokConnection.on('member', (data) => {
-            io.emit('bubble-action', {
-                type: 'join',
+            io.emit('tree-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: 10
+                points: 10,
+                type: 'member'
             });
         });
 
-        // 2. Comentariu în chat -> Intră sau primește +15 puncte
         tiktokConnection.on('chat', (data) => {
-            io.emit('bubble-action', {
-                type: 'chat',
+            io.emit('tree-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: 15
+                points: 20,
+                type: 'chat'
             });
         });
 
-        // 3. Like-uri (Tap-Tap) -> Crește dimensiunea și punctele
+        // 2. Like-uri (Tap-Tap) adaugă puncte
         tiktokConnection.on('like', (data) => {
             const count = data.likeCount || 1;
-            io.emit('bubble-action', {
-                type: 'like',
+            io.emit('tree-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: count * 5
+                points: count * 2,
+                type: 'like'
             });
         });
 
-        // 4. Cadouri -> Creștere masivă + Undă de șoc
+        // 3. Cadouri -> Cadouri uriașe în brad
         tiktokConnection.on('gift', (data) => {
-            // Procesăm la finalul seriei de combo sau la cadouri individuale
             if (data.giftType === 1 && !data.repeatEnd) return;
             const diamonds = (data.diamondCount || 1) * (data.repeatCount || 1);
-            io.emit('bubble-action', {
-                type: 'gift',
+            io.emit('tree-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: diamonds * 100
-            });
-        });
-
-        // 5. Follow / Share -> Boost special
-        tiktokConnection.on('social', (data) => {
-            io.emit('bubble-action', {
-                type: 'gift',
-                userId: data.uniqueId,
-                nickname: data.nickname || data.uniqueId,
-                avatar: data.profilePictureUrl,
-                points: 150
+                points: diamonds * 50,
+                type: 'gift'
             });
         });
     });
@@ -105,5 +92,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Serverul Bubble Battle rulează pe portul ${PORT}`);
+    console.log(`Bradul de Crăciun rulează pe portul ${PORT}`);
 });
