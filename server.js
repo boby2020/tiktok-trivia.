@@ -28,43 +28,82 @@ io.on('connection', (socket) => {
         currentUsername = cleanUser;
         tiktokConnection = new WebcastPushConnection(cleanUser, {
             processInitialData: false,
-            enableExtendedGiftInfo: false
+            enableExtendedGiftInfo: true
         });
 
         tiktokConnection.connect()
-            .then(state => {
+            .then(() => {
                 io.emit('status-update', { connected: true, username: cleanUser });
             })
-            .catch(err => {
+            .catch(() => {
                 io.emit('status-update', { 
                     connected: false, 
-                    error: 'Nu s-a putut conecta la TikTok (jocul rulează automat).' 
+                    error: 'TikTok blocat temporar (folosește butoanele Demo sau reîncearcă)' 
                 });
             });
 
-        // Ascultăm comentariile (1, 2, 3, 4 sau A, B, C, D)
+        // 1. Intrarea în live (Member Join)
+        tiktokConnection.on('member', (data) => {
+            io.emit('bubble-action', {
+                type: 'join',
+                userId: data.uniqueId,
+                nickname: data.nickname || data.uniqueId,
+                avatar: data.profilePictureUrl,
+                points: 10
+            });
+        });
+
+        // 2. Comentariu în chat -> Intră sau primește +15 puncte
         tiktokConnection.on('chat', (data) => {
-            const msg = (data.comment || '').trim().toUpperCase();
-            let answerIndex = -1;
+            io.emit('bubble-action', {
+                type: 'chat',
+                userId: data.uniqueId,
+                nickname: data.nickname || data.uniqueId,
+                avatar: data.profilePictureUrl,
+                points: 15
+            });
+        });
 
-            if (msg === '1' || msg === 'A') answerIndex = 0;
-            else if (msg === '2' || msg === 'B') answerIndex = 1;
-            else if (msg === '3' || msg === 'C') answerIndex = 2;
-            else if (msg === '4' || msg === 'D') answerIndex = 3;
+        // 3. Like-uri (Tap-Tap) -> Crește dimensiunea și punctele
+        tiktokConnection.on('like', (data) => {
+            const count = data.likeCount || 1;
+            io.emit('bubble-action', {
+                type: 'like',
+                userId: data.uniqueId,
+                nickname: data.nickname || data.uniqueId,
+                avatar: data.profilePictureUrl,
+                points: count * 5
+            });
+        });
 
-            if (answerIndex !== -1) {
-                io.emit('player-answer', {
-                    userId: data.uniqueId,
-                    nickname: data.nickname || data.uniqueId,
-                    avatar: data.profilePictureUrl,
-                    answerIndex: answerIndex
-                });
-            }
+        // 4. Cadouri -> Creștere masivă + Undă de șoc
+        tiktokConnection.on('gift', (data) => {
+            // Procesăm la finalul seriei de combo sau la cadouri individuale
+            if (data.giftType === 1 && !data.repeatEnd) return;
+            const diamonds = (data.diamondCount || 1) * (data.repeatCount || 1);
+            io.emit('bubble-action', {
+                type: 'gift',
+                userId: data.uniqueId,
+                nickname: data.nickname || data.uniqueId,
+                avatar: data.profilePictureUrl,
+                points: diamonds * 100
+            });
+        });
+
+        // 5. Follow / Share -> Boost special
+        tiktokConnection.on('social', (data) => {
+            io.emit('bubble-action', {
+                type: 'gift',
+                userId: data.uniqueId,
+                nickname: data.nickname || data.uniqueId,
+                avatar: data.profilePictureUrl,
+                points: 150
+            });
         });
     });
 });
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Serverul Milionar rulează pe portul ${PORT}`);
+    console.log(`Serverul Bubble Battle rulează pe portul ${PORT}`);
 });
