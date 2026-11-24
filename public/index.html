@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TikTok Bubble Battle Live</title>
+    <title>Bradul de Crăciun TikTok Live</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body {
-            background: #050814;
+            background: #020617;
             overflow: hidden;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
@@ -16,39 +16,27 @@
             height: 100vh;
             width: 100vw;
         }
-        /* Container vertical 9:16 optimizat pentru telefon */
         #game-container {
             position: relative;
             width: 100%;
             height: 100%;
             max-width: 540px;
-            background: radial-gradient(circle at 50% 35%, #1e293b 0%, #0f172a 55%, #020617 100%);
+            background: radial-gradient(circle at 50% 30%, #0f172a 0%, #090d16 60%, #020617 100%);
             overflow: hidden;
-            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
         }
-        /* Fundal stil neon oraș / logo subtil */
-        .bg-watermark {
+        /* Zăpadă pe fundal */
+        .snowflake {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+            background: #ffffff;
+            border-radius: 50%;
             pointer-events: none;
-            z-index: 1;
-            opacity: 0.22;
+            opacity: 0.8;
+            animation: fall linear infinite;
         }
-        .bg-watermark h1 {
-            font-size: 64px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #fff;
-            text-shadow: -3px -3px 0 #00f2fe, 3px 3px 0 #fe0979;
-        }
-        .bg-watermark p {
-            font-size: 18px;
-            color: #38bdf8;
-            font-weight: bold;
-            margin-top: 6px;
+        @keyframes fall {
+            0% { transform: translateY(-10px) translateX(0); }
+            100% { transform: translateY(105vh) translateX(20px); }
         }
         canvas {
             position: absolute;
@@ -58,15 +46,15 @@
             height: 100%;
             z-index: 2;
         }
-        /* Bara de control sus (se poate ascunde) */
+        /* Meniul de setări */
         #controls {
             position: absolute;
             top: 8px;
             left: 8px;
             right: 8px;
             z-index: 10;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(6px);
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.15);
             border-radius: 12px;
             padding: 8px;
@@ -75,15 +63,8 @@
             gap: 6px;
             transition: transform 0.3s ease;
         }
-        #controls.hidden {
-            transform: translateY(-130%);
-        }
-        .row {
-            display: flex;
-            gap: 5px;
-            justify-content: center;
-            align-items: center;
-        }
+        #controls.hidden { transform: translateY(-140%); }
+        .row { display: flex; gap: 6px; justify-content: center; align-items: center; }
         input {
             background: #020617;
             border: 1px solid #38bdf8;
@@ -102,23 +83,19 @@
             cursor: pointer;
             color: #fff;
         }
-        .btn-connect { background: #ec4899; }
-        .btn-demo { background: #2563eb; }
+        .btn-connect { background: #ef4444; }
+        .btn-test { background: #10b981; }
         .btn-gift { background: #f59e0b; color: #000; }
-        .btn-reset { background: #475569; }
-        #status {
-            font-size: 11px;
-            color: #94a3b8;
-            text-align: center;
-        }
-        /* Buton discret pentru a ascunde/arăta meniul pe live */
+        .btn-music { background: #8b5cf6; }
+        #status { font-size: 11px; color: #94a3b8; text-align: center; }
+        
         #toggle-ui {
             position: absolute;
             top: 10px;
             right: 10px;
             z-index: 11;
-            background: rgba(0,0,0,0.45);
-            color: rgba(255,255,255,0.7);
+            background: rgba(0,0,0,0.5);
+            color: #fff;
             border: 1px solid rgba(255,255,255,0.2);
             border-radius: 50%;
             width: 30px;
@@ -127,59 +104,74 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
-        /* Legenda de jos */
-        .bottom-legend {
+        .bottom-title {
             position: absolute;
-            bottom: 12px;
+            bottom: 10px;
             left: 0;
             right: 0;
-            z-index: 5;
             text-align: center;
-            pointer-events: none;
-            font-size: 13px;
-            font-weight: 800;
-            color: rgba(255, 255, 255, 0.85);
+            z-index: 5;
+            color: #f87171;
+            font-weight: 900;
+            font-size: 14px;
             text-shadow: 0 2px 6px rgba(0,0,0,0.9);
-            letter-spacing: 0.5px;
+            pointer-events: none;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <div class="bg-watermark">
-        <h1>TIKTOK<br>ARENA</h1>
-        <p>TAP-TAP & CADOURI = PUTERE</p>
-    </div>
+    <!-- Generare zăpadă -->
+    <script>
+        for(let i=0; i<45; i++) {
+            let sf = document.createElement('div');
+            sf.className = 'snowflake';
+            sf.style.left = Math.random() * 100 + 'vw';
+            sf.style.top = -Math.random() * 20 + 'vh';
+            let size = Math.random() * 4 + 2;
+            sf.style.width = size + 'px';
+            sf.style.height = size + 'px';
+            sf.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            sf.style.animationDelay = (Math.random() * 5) + 's';
+            document.getElementById('game-container').appendChild(sf);
+        }
+    </script>
 
-    <canvas id="arena"></canvas>
+    <canvas id="treeCanvas"></canvas>
 
-    <button id="toggle-ui" onclick="toggleControls()" title="Ascunde/Arată meniul">⚙️</button>
+    <button id="toggle-ui" onclick="toggleControls()">🎄</button>
 
     <div id="controls">
         <div class="row">
             <input type="text" id="username" value="eusebiusebisebi" placeholder="User TikTok">
             <button class="btn-connect" onclick="connectTikTok()">Conectează</button>
-            <button class="btn-reset" onclick="resetArena()">Reset</button>
+            <button class="btn-music" onclick="toggleMusic()">🎵 Muzică</button>
         </div>
         <div class="row">
-            <button class="btn-demo" onclick="spawnBots(15)">+15 Jucători</button>
-            <button class="btn-demo" onclick="boostRandom('like')">❤️ Tap-Tap</button>
-            <button class="btn-gift" onclick="boostRandom('gift')">🎁 Cadou Mare</button>
+            <button class="btn-test" onclick="testOrnaments(5)">+ Adaugă Globuri</button>
+            <button class="btn-gift" onclick="testGift()">🎁 Cadou Brad</button>
         </div>
-        <div id="status">Apasă ❤️ sau 🎁 pentru test, sau conectează Live-ul!</div>
+        <div id="status">Conectează Live-ul sau testează decorațiunile!</div>
     </div>
 
-    <div class="bottom-legend">
-        ❤️ TAP-TAP = CREȘTI &nbsp;|&nbsp; 🎁 CADOU = EXPLODEZI ÎN FORȚĂ
+    <div class="bottom-title">
+        ✨ TAP-TAP & CADOURI = ÎMPODOBEȘTE BRADUL DE CRĂCIUN! ✨
     </div>
 </div>
+
+<!-- Audio Crăciun (Melodie fundal gratuită de pe web) -->
+<audio id="bg-music" loop>
+    <source src="https://upload.wikimedia.org/wikipedia/commons/e/e9/Jingle_Bells_%28instrumental%29.ogg" type="audio/ogg">
+</audio>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
-    const canvas = document.getElementById('arena');
+    const canvas = document.getElementById('treeCanvas');
     const ctx = canvas.getContext('2d');
     const container = document.getElementById('game-container');
 
@@ -193,40 +185,15 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Structura jucătorilor: Map userId -> Bubble
-    const bubbles = new Map();
-    const shockwaves = [];
-    const floatingTexts = [];
+    // Colecția de decorațiuni din brad
+    const ornaments = [];
+    const maxOrnaments = 45; // Număr maxim în brad vizibile frumos
 
-    const ringColors = ['#f59e0b', '#ef4444', '#10b981', '#3b82f6', '#ec4899', '#a855f7', '#06b6d4'];
-
-    function formatPoints(pts) {
-        if (pts >= 1000000) return (pts / 1000000).toFixed(1).replace('.0', '') + 'M';
-        if (pts >= 1000) return (pts / 1000).toFixed(1).replace('.0', '') + 'K';
-        return Math.floor(pts).toString();
-    }
-
-    function getRadiusFromPoints(pts) {
-        // Rază minimă 18px, maximă 78px pe mobil
-        const r = 18 + Math.sqrt(pts) * 0.95;
-        return Math.min(78, Math.max(18, r));
-    }
-
-    class Bubble {
-        constructor(userId, nickname, avatarUrl, points = 10) {
+    class Ornament {
+        constructor(userId, nickname, avatarUrl, points) {
             this.userId = userId;
-            this.nickname = nickname || 'Player';
+            this.nickname = nickname || 'Guest';
             this.points = points;
-            this.radius = getRadiusFromPoints(points);
-            this.targetRadius = this.radius;
-
-            this.x = Math.random() * (width - 80) + 40;
-            this.y = Math.random() * (height - 160) + 80;
-            this.vx = (Math.random() - 0.5) * 3.5;
-            this.vy = (Math.random() - 0.5) * 3.5;
-
-            this.color = ringColors[Math.floor(Math.random() * ringColors.length)];
-            this.glowTimer = 0;
             this.img = null;
             this.imgLoaded = false;
 
@@ -239,101 +206,46 @@
                     this.imgLoaded = true;
                 };
             }
+
+            this.assignPosition();
         }
 
-        addPoints(pts, isGift = false) {
-            this.points += pts;
-            this.targetRadius = getRadiusFromPoints(this.points);
-            this.glowTimer = isGift ? 90 : 25;
+        assignPosition() {
+            // Distribuție triunghiulară în interiorul bradului
+            // Vârful bradului este sus, baza jos
+            const treeTopY = height * 0.22;
+            const treeBottomY = height * 0.76;
+            
+            // Alegem o înălțime aleatorie pe brad
+            this.relY = Math.random(); // 0 = sus, 1 = jos
+            this.y = treeTopY + this.relY * (treeBottomY - treeTopY);
 
-            if (isGift) {
-                // Undă de șoc care împinge bulele din jur
-                shockwaves.push({
-                    x: this.x,
-                    y: this.y,
-                    radius: this.radius,
-                    maxRadius: this.radius + 140,
-                    alpha: 1,
-                    color: '#fde047'
-                });
-
-                bubbles.forEach(other => {
-                    if (other.userId === this.userId) return;
-                    const dx = other.x - this.x;
-                    const dy = other.y - this.y;
-                    const dist = Math.hypot(dx, dy);
-                    if (dist < 180 && dist > 0) {
-                        const force = (180 - dist) / 18;
-                        other.vx += (dx / dist) * force;
-                        other.vy += (dy / dist) * force;
-                    }
-                });
-            }
-
-            // Text plutitor (+15, +500 etc.)
-            if (pts >= 15) {
-                floatingTexts.push({
-                    x: this.x,
-                    y: this.y - this.radius,
-                    text: `+${formatPoints(pts)}`,
-                    alpha: 1,
-                    color: isGift ? '#fde047' : '#38bdf8'
-                });
-            }
+            // Lățimea bradului la această înălțime
+            const maxWidthAtY = this.relY * (width * 0.38) + 15;
+            this.x = (width / 2) + (Math.random() - 0.5) * maxWidthAtY * 2;
+            
+            this.radius = 22 + Math.min(12, this.points / 100);
+            this.color = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#ec4899'][Math.floor(Math.random() * 5)];
         }
 
-        update() {
-            // Tranziție lină la mărime
-            this.radius += (this.targetRadius - this.radius) * 0.12;
-            if (this.glowTimer > 0) this.glowTimer--;
-
-            // Mișcare ușoară continuă (să nu stea pe loc)
-            this.vx += (Math.random() - 0.5) * 0.12;
-            this.vy += (Math.random() - 0.5) * 0.12;
-
-            // Limitare viteză maximă
-            const speed = Math.hypot(this.vx, this.vy);
-            const maxSpeed = 4.2;
-            if (speed > maxSpeed) {
-                this.vx = (this.vx / speed) * maxSpeed;
-                this.vy = (this.vy / speed) * maxSpeed;
-            }
-
-            this.x += this.vx;
-            this.y += this.vy;
-
-            // Ricoșeu din pereții ecranului
-            const topMargin = 45;
-            const bottomMargin = 38;
-            if (this.x - this.radius < 4) {
-                this.x = this.radius + 4;
-                this.vx = Math.abs(this.vx) * 0.9;
-            } else if (this.x + this.radius > width - 4) {
-                this.x = width - this.radius - 4;
-                this.vx = -Math.abs(this.vx) * 0.9;
-            }
-
-            if (this.y - this.radius < topMargin) {
-                this.y = this.radius + topMargin;
-                this.vy = Math.abs(this.vy) * 0.9;
-            } else if (this.y + this.radius > height - bottomMargin) {
-                this.y = height - this.radius - bottomMargin;
-                this.vy = -Math.abs(this.vy) * 0.9;
-            }
-        }
-
-        draw(isLeader) {
+        draw() {
             ctx.save();
+            
+            // Strălucire glob
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius + 3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.4)';
+            ctx.fill();
 
-            // Aură strălucitoare pentru lider sau când primește cadou
-            if (isLeader || this.glowTimer > 0) {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
-                ctx.fillStyle = isLeader ? 'rgba(250, 204, 21, 0.35)' : 'rgba(56, 189, 248, 0.35)';
-                ctx.fill();
-            }
+            // Sfoară glob
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y - this.radius);
+            ctx.lineTo(this.x, this.y - this.radius - 8);
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.stroke();
 
-            // Decupaj circular pentru poză
+            // Glob / Cadou circular cu poză
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.closePath();
@@ -343,205 +255,125 @@
             if (this.imgLoaded && this.img) {
                 ctx.drawImage(this.img, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
             } else {
-                // Fundal colorat cu inițiala dacă nu are poză
                 ctx.fillStyle = this.color;
                 ctx.fill();
                 ctx.fillStyle = '#fff';
-                ctx.font = `bold ${Math.max(12, this.radius * 0.75)}px sans-serif`;
+                ctx.font = `bold ${Math.max(10, this.radius * 0.7)}px sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(this.nickname.substring(0, 2).toUpperCase(), this.x, this.y - 3);
+                ctx.fillText(this.nickname.substring(0, 2).toUpperCase(), this.x, this.y);
             }
-
-            // Umbră jos pe bulă pentru lizibilitatea scorului
-            const grad = ctx.createLinearGradient(0, this.y, 0, this.y + this.radius);
-            grad.addColorStop(0, 'rgba(0,0,0,0)');
-            grad.addColorStop(1, 'rgba(0,0,0,0.85)');
-            ctx.fillStyle = grad;
-            ctx.fillRect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
             ctx.restore();
 
-            // Contur exterior colorat (gros pentru lideri)
+            // Contur festiv
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.lineWidth = isLeader ? 4 : 2.5;
-            ctx.strokeStyle = isLeader ? '#fde047' : (this.glowTimer > 0 ? '#ffffff' : this.color);
+            ctx.strokeStyle = '#fde047';
+            ctx.lineWidth = 2.5;
             ctx.stroke();
 
-            // Afișare scor (ex: 3.4K) exact ca în clip
-            const scoreStr = formatPoints(this.points);
-            const fontSize = Math.max(10, Math.min(20, this.radius * 0.42));
-            ctx.font = `900 ${fontSize}px sans-serif`;
+            // Nume scurt sub glob
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 10px sans-serif';
             ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-
-            // Pastilă neagră în spatele scorului
-            const textW = ctx.measureText(scoreStr).width + 8;
-            const pillH = fontSize + 4;
-            const pillY = this.y + this.radius * 0.42;
-
-            ctx.fillStyle = isLeader ? '#dc2626' : 'rgba(15, 23, 42, 0.88)';
-            ctx.beginPath();
-            ctx.roundRect(this.x - textW / 2, pillY - pillH / 2, textW, pillH, 6);
-            ctx.fill();
-
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText(scoreStr, this.x, pillY + 1);
-
-            // Coroană pentru locul 1
-            if (isLeader) {
-                ctx.font = `${Math.max(16, this.radius * 0.45)}px sans-serif`;
-                ctx.fillText('👑', this.x, this.y - this.radius - 6);
-            }
+            ctx.fillText(this.nickname.substring(0, 8), this.x, this.y + this.radius + 12);
 
             ctx.restore();
         }
     }
 
-    // Fizica de ciocnire elastică între toate bulele
-    function resolveCollisions() {
-        const list = Array.from(bubbles.values());
-        for (let i = 0; i < list.length; i++) {
-            for (let j = i + 1; j < list.length; j++) {
-                const a = list[i];
-                const b = list[j];
-                const dx = b.x - a.x;
-                const dy = b.y - a.y;
-                const dist = Math.hypot(dx, dy);
-                const minDist = a.radius + b.radius + 2;
+    function drawTree() {
+        const cx = width / 2;
+        
+        // Steaua din vârful bradului
+        ctx.font = '36px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⭐', cx, height * 0.17);
 
-                if (dist < minDist && dist > 0) {
-                    // Separare ca să nu se suprapună
-                    const overlap = (minDist - dist) / 2;
-                    const nx = dx / dist;
-                    const ny = dy / dist;
+        // Trunchiul bradului
+        ctx.fillStyle = '#78350f';
+        ctx.fillRect(cx - 18, height * 0.75, 36, 45);
 
-                    // Masa proporțională cu raza (bulele mari împing mai tare!)
-                    const massA = a.radius * a.radius;
-                    const massB = b.radius * b.radius;
-                    const totalMass = massA + massB;
+        // Straturile verzi ale bradului (triunghiuri suprapuse)
+        const layers = [
+            { topY: height * 0.20, bottomY: height * 0.42, w: width * 0.24 },
+            { topY: height * 0.38, bottomY: height * 0.60, w: width * 0.34 },
+            { topY: height * 0.56, bottomY: height * 0.76, w: width * 0.44 }
+        ];
 
-                    a.x -= nx * overlap * (massB / totalMass) * 2;
-                    a.y -= ny * overlap * (massB / totalMass) * 2;
-                    b.x += nx * overlap * (massA / totalMass) * 2;
-                    b.y += ny * overlap * (massA / totalMass) * 2;
+        layers.forEach((l, index) => {
+            ctx.beginPath();
+            ctx.moveTo(cx, l.topY);
+            ctx.lineTo(cx + l.w, l.bottomY);
+            ctx.lineTo(cx - l.w, l.bottomY);
+            ctx.closePath();
+            
+            // Gradient verde festiv
+            const grad = ctx.createLinearGradient(cx - l.w, 0, cx + l.w, 0);
+            grad.addColorStop(0, '#065f46');
+            grad.addColorStop(0.5, '#059669');
+            grad.addColorStop(1, '#047857');
+            ctx.fillStyle = grad;
+            ctx.fill();
 
-                    // Schimb de impuls la ciocnire
-                    const rvx = b.vx - a.vx;
-                    const rvy = b.vy - a.vy;
-                    const velAlongNormal = rvx * nx + rvy * ny;
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        });
 
-                    if (velAlongNormal < 0) {
-                        const restitution = 0.85;
-                        const impulse = -(1 + restitution) * velAlongNormal / (1 / massA + 1 / massB);
-                        a.vx -= (impulse / massA) * nx;
-                        a.vy -= (impulse / massA) * ny;
-                        b.vx += (impulse / massB) * nx;
-                        b.vy += (impulse / massB) * ny;
-                    }
-                }
-            }
-        }
+        // Luminițe licăritoare pe brad
+        const time = Date.now() * 0.003;
+        const lights = [
+            {x: cx, y: height * 0.30}, {x: cx - 25, y: height * 0.45}, {x: cx + 30, y: height * 0.42},
+            {x: cx - 50, y: height * 0.58}, {x: cx + 45, y: height * 0.55}, {x: cx, y: height * 0.52},
+            {x: cx - 75, y: height * 0.70}, {x: cx + 70, y: height * 0.68}, {x: cx - 20, y: height * 0.65}
+        ];
+        lights.forEach((lt, idx) => {
+            ctx.beginPath();
+            ctx.arc(lt.x, lt.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = (idx % 2 === 0 && Math.sin(time + idx) > 0) ? '#fde047' : '#ef4444';
+            ctx.fill();
+        });
     }
 
     function animate() {
         ctx.clearRect(0, 0, width, height);
 
-        // Găsim liderul (cea mai mare bulă)
-        let leaderId = null;
-        let maxPts = -1;
-        bubbles.forEach((b, id) => {
-            if (b.points > maxPts) {
-                maxPts = b.points;
-                leaderId = id;
-            }
-        });
+        // Desenăm bradul
+        drawTree();
 
-        // Actualizăm și rezolvăm ciocnirile
-        bubbles.forEach(b => b.update());
-        resolveCollisions();
-
-        // Desenăm undele de șoc
-        for (let i = shockwaves.length - 1; i >= 0; i--) {
-            const sw = shockwaves[i];
-            sw.radius += 5;
-            sw.alpha -= 0.03;
-            if (sw.alpha <= 0) {
-                shockwaves.splice(i, 1);
-                continue;
-            }
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(253, 224, 71, ${sw.alpha})`;
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        // Desenăm bulele (liderul ultimul ca să fie deasupra)
-        bubbles.forEach((b, id) => {
-            if (id !== leaderId) b.draw(false);
-        });
-        if (leaderId && bubbles.has(leaderId)) {
-            bubbles.get(leaderId).draw(true);
-        }
-
-        // Textele plutitoare (+500 etc.)
-        for (let i = floatingTexts.length - 1; i >= 0; i--) {
-            const ft = floatingTexts[i];
-            ft.y -= 1.2;
-            ft.alpha -= 0.025;
-            if (ft.alpha <= 0) {
-                floatingTexts.splice(i, 1);
-                continue;
-            }
-            ctx.save();
-            ctx.font = '900 16px sans-serif';
-            ctx.fillStyle = ft.color;
-            ctx.globalAlpha = ft.alpha;
-            ctx.textAlign = 'center';
-            ctx.fillText(ft.text, ft.x, ft.y);
-            ctx.restore();
-        }
+        // Desenăm toate globurile / cadourile din brad
+        ornaments.forEach(o => o.draw());
 
         requestAnimationFrame(animate);
     }
 
-    // Evenimente primite de la serverul TikTok
-    socket.on('bubble-action', (data) => {
-        handlePlayerAction(data.userId, data.nickname, data.avatar, data.points, data.type === 'gift');
+    // Gestionare acțiuni live TikTok
+    socket.on('tree-action', (data) => {
+        addOrUpdateOrnament(data.userId, data.nickname, data.avatar, data.points);
     });
 
     socket.on('status-update', (data) => {
         const st = document.getElementById('status');
         if (data.connected) {
             st.style.color = '#4ade80';
-            st.textContent = `🟢 Conectat LIVE la @${data.username}`;
+            st.textContent = `🟢 Conectat la @${data.username}`;
         } else {
             st.style.color = '#fbbf24';
             st.textContent = `🟡 ${data.error}`;
         }
     });
 
-    function handlePlayerAction(userId, nickname, avatar, points, isGift) {
-        if (!bubbles.has(userId)) {
-            // Limităm la 90 de bule simultane pentru performanță fluidă pe telefon
-            if (bubbles.size >= 90) {
-                // Eliminăm cea mai mică bulă ca să facem loc
-                let smallestId = null;
-                let minPts = Infinity;
-                bubbles.forEach((b, id) => {
-                    if (b.points < minPts) {
-                        minPts = b.points;
-                        smallestId = id;
-                    }
-                });
-                if (smallestId) bubbles.delete(smallestId);
-            }
-            bubbles.set(userId, new Bubble(userId, nickname, avatar, points));
+    function addOrUpdateOrnament(userId, nickname, avatar, pts) {
+        let existing = ornaments.find(o => o.userId === userId);
+        if (existing) {
+            existing.points += pts;
         } else {
-            bubbles.get(userId).addPoints(points, isGift);
+            if (ornaments.length >= maxOrnaments) {
+                ornaments.shift(); // scoatem cel mai vechi glob
+            }
+            ornaments.push(new Ornament(userId, nickname, avatar, pts));
         }
     }
 
@@ -549,6 +381,7 @@
         const user = document.getElementById('username').value.trim();
         if (!user) return;
         document.getElementById('status').textContent = `Se conectează la @${user}...`;
+        socket.emit('connect-username', user); // corectat trimiterea în server
         socket.emit('connect-tiktok', user);
     }
 
@@ -556,35 +389,33 @@
         document.getElementById('controls').classList.toggle('hidden');
     }
 
-    function resetArena() {
-        bubbles.clear();
-    }
-
-    // Funcții de test / animare a ecranului
-    const sampleNames = ["Andrei", "Maria", "Alex", "Elena", "Denis", "Ioana", "Vlad", "Bianca", "Seby", "Gabi", "Cristi", "Daria", "Mihai", "Teo", "Raul"];
-    function spawnBots(count) {
-        for (let i = 0; i < count; i++) {
-            const id = 'bot_' + Math.floor(Math.random() * 100000);
-            const name = sampleNames[Math.floor(Math.random() * sampleNames.length)];
-            const startPts = Math.floor(Math.random() * 150) + 10;
-            handlePlayerAction(id, name, null, startPts, false);
-        }
-    }
-
-    function boostRandom(type) {
-        if (bubbles.size === 0) spawnBots(12);
-        const keys = Array.from(bubbles.keys());
-        const randomKey = keys[Math.floor(Math.random() * keys.length)];
-        const b = bubbles.get(randomKey);
-        if (type === 'gift') {
-            b.addPoints(Math.floor(Math.random() * 900) + 300, true);
+    // Muzică de Crăciun Play/Pause
+    let musicPlaying = false;
+    function toggleMusic() {
+        const audio = document.getElementById('bg-music');
+        if (musicPlaying) {
+            audio.pause();
+            musicPlaying = false;
         } else {
-            b.addPoints(Math.floor(Math.random() * 40) + 15, false);
+            audio.play().catch(e => console.log("Eroare redare audio:", e));
+            musicPlaying = true;
         }
     }
 
-    // Pornim cu 18 jucători în arenă ca să arate spectaculos din prima secundă
-    spawnBots(18);
+    // Funcții de Test / Simulare
+    const testNames = ["Andrei", "Maria", "Alex", "Elena", "Denis", "Ioana", "Vlad", "Bianca", "Cristi", "Teo"];
+    function testOrnaments(count) {
+        for (let i = 0; i < count; i++) {
+            const name = testNames[Math.floor(Math.random() * testNames.length)] + Math.floor(Math.random()*90);
+            addOrUpdateOrnament('user_' + Math.random(), name, null, Math.floor(Math.random() * 200) + 20);
+        }
+    }
+    function testGift() {
+        addOrUpdateOrnament('gift_vip', 'Moș Crăciun', null, 1500);
+    }
+
+    // Populăm bradul la început cu câțiva spectatori test
+    testOrnaments(6);
     animate();
 </script>
 </body>
