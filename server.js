@@ -26,56 +26,64 @@ io.on('connection', (socket) => {
         }
 
         currentUsername = cleanUser;
+        console.log(`Se încearcă conectarea la live-ul: @${cleanUser}`);
+
         tiktokConnection = new WebcastPushConnection(cleanUser, {
-            processInitialData: false,
-            enableExtendedGiftInfo: true
+            processInitialData: true,
+            enableExtendedGiftInfo: true,
+            requestOptions: {
+                timeout: 10000
+            }
         });
 
         tiktokConnection.connect()
-            .then(() => {
+            .then(state => {
+                console.log(`Conectat cu succes la camera roomID: ${state.roomId}`);
                 io.emit('status-update', { connected: true, username: cleanUser });
             })
-            .catch(() => {
+            .catch(err => {
+                console.error('Eroare conexiune TikTok:', err);
                 io.emit('status-update', { 
                     connected: false, 
-                    error: 'TikTok blocat temporar (foloseștebutoanele de test)' 
+                    error: 'Conexiune blocată de TikTok. Folosește butoanele de test sau reîncearcă.' 
                 });
             });
 
-        // 1. Cine intră sau comentează devine glob/cadou în brad
+        // Eveniment: Spectator care intră în live
         tiktokConnection.on('member', (data) => {
             io.emit('tree-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: 10,
+                points: 15,
                 type: 'member'
             });
         });
 
+        // Eveniment: Mesaj în chat
         tiktokConnection.on('chat', (data) => {
             io.emit('tree-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: 20,
+                points: 25,
                 type: 'chat'
             });
         });
 
-        // 2. Like-uri (Tap-Tap) adaugă puncte
+        // Eveniment: Like-uri (Tap-Tap)
         tiktokConnection.on('like', (data) => {
             const count = data.likeCount || 1;
             io.emit('tree-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: count * 2,
+                points: count * 3,
                 type: 'like'
             });
         });
 
-        // 3. Cadouri -> Cadouri uriașe în brad
+        // Eveniment: Cadouri trimise
         tiktokConnection.on('gift', (data) => {
             if (data.giftType === 1 && !data.repeatEnd) return;
             const diamonds = (data.diamondCount || 1) * (data.repeatCount || 1);
@@ -83,7 +91,7 @@ io.on('connection', (socket) => {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: diamonds * 50,
+                points: diamonds * 80,
                 type: 'gift'
             });
         });
@@ -92,5 +100,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Bradul de Crăciun rulează pe portul ${PORT}`);
+    console.log(`Serverul rulează pe portul ${PORT}`);
 });
