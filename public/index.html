@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brad de Crăciun TikTok Live</title>
+    <title>Zidul Penitenciarului - Joc Interactiv TikTok Live</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body {
-            background: #050201;
+            background: #05070a;
             overflow: hidden;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
@@ -16,42 +16,14 @@
             height: 100vh;
             width: 100vw;
         }
-        /* Format vertical 9:16 complet optimizat pentru ecranul de live */
         #game-container {
             position: relative;
             width: 100%;
             height: 100%;
             max-width: 540px;
-            background: radial-gradient(circle at 50% 35%, #231208 0%, #100602 60%, #030100 100%);
+            background: #0b0f17;
             overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,0.95);
-        }
-        /* Șemineu cald în fundal */
-        .fireplace {
-            position: absolute;
-            bottom: 16%;
-            left: 3%;
-            width: 135px;
-            height: 155px;
-            background: #1c0f07;
-            border: 4px solid #3d2110;
-            border-radius: 10px;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.9), 0 0 15px rgba(249, 115, 22, 0.25);
-            z-index: 1;
-        }
-        .fire-glow {
-            position: absolute;
-            bottom: 10px;
-            left: 12px;
-            right: 12px;
-            height: 65px;
-            background: radial-gradient(circle, #fb923c 0%, #dc2626 60%, transparent 100%);
-            border-radius: 50%;
-            animation: flicker 0.5s infinite alternate;
-        }
-        @keyframes flicker {
-            0% { opacity: 0.8; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1.05); }
+            box-shadow: 0 0 60px rgba(0,0,0,0.95);
         }
         canvas {
             position: absolute;
@@ -67,32 +39,32 @@
             left: 10px;
             right: 10px;
             z-index: 10;
-            background: rgba(20, 11, 6, 0.92);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(245, 158, 11, 0.4);
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.4);
             border-radius: 14px;
             padding: 10px;
             display: flex;
             flex-direction: column;
             gap: 8px;
             transition: transform 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
-        #controls.hidden { transform: translateY(-160%); }
-        .row { display: flex; gap: 6px; justify-content: center; align-items: center; }
+        #controls.hidden { transform: translateY(-170%); }
+        .row { display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap; }
         input {
-            background: #0c0401;
-            border: 1px solid #f59e0b;
+            background: #020617;
+            border: 1px solid #38bdf8;
             color: #fff;
             padding: 7px 10px;
             border-radius: 8px;
             font-size: 13px;
-            width: 140px;
+            width: 135px;
         }
         button {
             border: none;
             border-radius: 8px;
-            padding: 7px 12px;
+            padding: 7px 11px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
@@ -100,19 +72,19 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         .btn-connect { background: #ec4899; }
+        .btn-voice { background: #3b82f6; }
         .btn-test { background: #10b981; }
         .btn-gift { background: #f59e0b; color: #000; }
-        .btn-music { background: #8b5cf6; }
-        #status { font-size: 11px; color: #cbd5e1; text-align: center; }
-        
+        #status { font-size: 11px; color: #94a3b8; text-align: center; }
+
         #toggle-ui {
             position: absolute;
             top: 12px;
             right: 12px;
             z-index: 11;
-            background: rgba(0,0,0,0.6);
-            color: #fde047;
-            border: 1px solid rgba(245,158,11,0.5);
+            background: rgba(0,0,0,0.65);
+            color: #38bdf8;
+            border: 1px solid rgba(56,189,248,0.5);
             border-radius: 50%;
             width: 36px;
             height: 36px;
@@ -131,51 +103,42 @@
             z-index: 5;
             color: #fde047;
             font-weight: 900;
-            font-size: 13px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+            font-size: 12px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.95);
             pointer-events: none;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
 
 <div id="game-container">
-    <div class="fireplace">
-        <div style="position: absolute; top: 6px; left: 0; right: 0; text-align: center; font-size: 14px; color:#fdba74;">🔥 Șemineu</div>
-        <div class="fire-glow"></div>
-    </div>
+    <canvas id="wallCanvas"></canvas>
 
-    <canvas id="treeCanvas"></canvas>
-
-    <button id="toggle-ui" onclick="toggleControls()">🎄</button>
+    <button id="toggle-ui" onclick="toggleControls()">⚙️</button>
 
     <div id="controls">
         <div class="row">
             <input type="text" id="username" value="eusebiusebisebi" placeholder="User TikTok">
             <button class="btn-connect" onclick="connectTikTok()">Conectează</button>
-            <button class="btn-music" id="music-btn" onclick="toggleMusic()">🎵 Pornește Colinde</button>
+            <button class="btn-voice" id="voice-btn" onclick="toggleVoice()">🔊 Voce RO: PORNITĂ</button>
         </div>
         <div class="row">
-            <button class="btn-test" onclick="spawnOrnaments(6)">+ Adaugă Globuri</button>
-            <button class="btn-gift" onclick="spawnGiantGift()">🎁 Cadou VIP</button>
+            <button class="btn-test" onclick="testViewer()">+ Intrare Spectator</button>
+            <button class="btn-gift" onclick="testGift()">🎁 Cadou Mare</button>
         </div>
-        <div id="status">Conectează Live-ul sau pornește muzica!</div>
+        <div id="status">Atinge ecranul o dată pentru sunet și voce!</div>
     </div>
 
     <div class="bottom-banner">
-        ✨ TAP-TAP & CADOURI = ÎMPODOBEȘTE BRADUL LA ȘEMINEU! ✨
+        💥 INTRĂ PE LIVE / TAP-TAP / CADOURI = APARI PE ZID! 💥
     </div>
 </div>
-
-<!-- Player colinde integrat nativ -->
-<audio id="festive-music" preload="auto" loop>
-    <source src="https://actions.google.com/sounds/v1/holidays/christmas_pudding.ogg" type="audio/ogg">
-</audio>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
-    const canvas = document.getElementById('treeCanvas');
+    const canvas = document.getElementById('wallCanvas');
     const ctx = canvas.getContext('2d');
     const container = document.getElementById('game-container');
 
@@ -189,28 +152,206 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Zăpadă
-    const snowflakes = [];
-    for (let i = 0; i < 55; i++) {
-        snowflakes.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            radius: Math.random() * 2.5 + 0.8,
-            speed: Math.random() * 1.2 + 0.4,
-            opacity: Math.random() * 0.8 + 0.2
+    // --- SISTEM AUDIO & VOCE ÎN LIMBA ROMÂNĂ ---
+    let voiceEnabled = true;
+    const speechQueue = [];
+    let isSpeaking = false;
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function unlockAudio() {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+    window.addEventListener('touchstart', unlockAudio, { once: true });
+    window.addEventListener('click', unlockAudio, { once: true });
+
+    function playLaserOrSpraySound() {
+        try {
+            unlockAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.18);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.18);
+        } catch (e) {}
+    }
+
+    function speakRomanian(text) {
+        if (!voiceEnabled || !('speechSynthesis' in window)) return;
+        speechQueue.push(text);
+        processSpeechQueue();
+    }
+
+    function processSpeechQueue() {
+        if (isSpeaking || speechQueue.length === 0) return;
+        isSpeaking = true;
+        const text = speechQueue.shift();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ro-RO';
+        utterance.rate = 1.05;
+        utterance.pitch = 1.05;
+
+        const voices = window.speechSynthesis.getVoices();
+        const roVoice = voices.find(v => v.lang.includes('ro'));
+        if (roVoice) utterance.voice = roVoice;
+
+        utterance.onend = () => {
+            isSpeaking = false;
+            processSpeechQueue();
+        };
+        utterance.onerror = () => {
+            isSpeaking = false;
+            processSpeechQueue();
+        };
+        window.speechSynthesis.speak(utterance);
+    }
+
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    function toggleVoice() {
+        voiceEnabled = !voiceEnabled;
+        const btn = document.getElementById('voice-btn');
+        if (voiceEnabled) {
+            btn.textContent = '🔊 Voce RO: PORNITĂ';
+            btn.style.background = '#3b82f6';
+            speakRomanian('Vocea a fost pornită!');
+        } else {
+            btn.textContent = '🔇 Voce RO: OPRITĂ';
+            btn.style.background = '#64748b';
+            window.speechSynthesis.cancel();
+            speechQueue.length = 0;
+            isSpeaking = false;
+        }
+    }
+
+    // --- GRAFICA ZIDULUI DE PENITENCIAR ---
+    const paintSplatters = [];
+    const targets = [];
+    const beams = [];
+    const maxTargets = 16;
+
+    const neonColors = ['#ff0055', '#00f0ff', '#fde047', '#10b981', '#a855f7', '#f97316'];
+
+    function drawPrisonEnvironment() {
+        // 1. Cerul nopții cu tentă albastru-închis
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, height * 0.25);
+        skyGrad.addColorStop(0, '#020617');
+        skyGrad.addColorStop(1, '#1e3a8a');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, width, height * 0.25);
+
+        // 2. Turn de pază în dreapta sus + reflector
+        const towerX = width * 0.80;
+        const towerY = height * 0.08;
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(towerX - 18, towerY + 25, 36, height * 0.16);
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(towerX - 24, towerY, 48, 28);
+        // Fereastră luminată turn
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(towerX - 16, towerY + 6, 32, 12);
+
+        // Fascicul reflector din turn
+        ctx.save();
+        const beamGrad = ctx.createLinearGradient(towerX, towerY + 12, width * 0.3, height * 0.6);
+        beamGrad.addColorStop(0, 'rgba(254, 240, 138, 0.35)');
+        beamGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+        ctx.fillStyle = beamGrad;
+        ctx.beginPath();
+        ctx.moveTo(towerX, towerY + 12);
+        ctx.lineTo(width * 0.1, height * 0.65);
+        ctx.lineTo(width * 0.65, height * 0.65);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // 3. Zidul masiv de beton cu textură uzată
+        const wallTop = height * 0.22;
+        const wallBottom = height * 0.72;
+        const wallGrad = ctx.createLinearGradient(0, wallTop, 0, wallBottom);
+        wallGrad.addColorStop(0, '#475569');
+        wallGrad.addColorStop(0.5, '#334155');
+        wallGrad.addColorStop(1, '#1e293b');
+        ctx.fillStyle = wallGrad;
+        ctx.fillRect(0, wallTop, width, wallBottom - wallTop);
+
+        // Rosturi verticale între plăcile de beton ale zidului
+        ctx.strokeStyle = 'rgba(15, 23, 42, 0.5)';
+        ctx.lineWidth = 2;
+        for (let x = 40; x < width; x += 65) {
+            ctx.beginPath();
+            ctx.moveTo(x, wallTop);
+            ctx.lineTo(x, wallBottom);
+            ctx.stroke();
+        }
+
+        // 4. Sârmă ghimpată spiralată pe coama zidului
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        for (let x = 0; x < width + 20; x += 18) {
+            ctx.beginPath();
+            ctx.arc(x, wallTop - 8, 12, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // 5. Două reflectoare puternice montate pe zid
+        [width * 0.22, width * 0.78].forEach(lx => {
+            ctx.save();
+            const glow = ctx.createRadialGradient(lx, wallTop + 35, 4, lx, wallTop + 35, 95);
+            glow.addColorStop(0, 'rgba(253, 224, 71, 0.95)');
+            glow.addColorStop(0.3, 'rgba(245, 158, 11, 0.45)');
+            glow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(lx, wallTop + 35, 95, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#fef9c3';
+            ctx.beginPath();
+            ctx.arc(lx, wallTop + 35, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
+
+        // 6. Asfaltul ud de jos cu reflexii colorate
+        const floorGrad = ctx.createLinearGradient(0, wallBottom, 0, height);
+        floorGrad.addColorStop(0, '#0f172a');
+        floorGrad.addColorStop(1, '#020617');
+        ctx.fillStyle = floorGrad;
+        ctx.fillRect(0, wallBottom, width, height - wallBottom);
+
+        // Reflexii luminoase pe asfaltul ud
+        paintSplatters.forEach(sp => {
+            ctx.save();
+            ctx.globalAlpha = 0.22;
+            ctx.fillStyle = sp.color;
+            ctx.beginPath();
+            ctx.ellipse(sp.x, wallBottom + (sp.y - wallTop) * 0.32, sp.radius * 0.9, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
         });
     }
 
-    const ornaments = [];
-    const maxOrnaments = 55;
-
-    class Ornament {
+    // --- ȚINTELE (SPECTATORII CU VOPSEA NEON PE ZID) ---
+    class WallTarget {
         constructor(userId, nickname, avatarUrl, points) {
             this.userId = userId;
-            this.nickname = nickname || 'Guest';
+            this.nickname = nickname || 'Spectator';
             this.points = points;
+            this.color = neonColors[Math.floor(Math.random() * neonColors.length)];
             this.img = null;
             this.imgLoaded = false;
+            this.scale = 0.1;
+            this.targetScale = 1.0;
 
             if (avatarUrl) {
                 const image = new Image();
@@ -218,180 +359,221 @@
                 image.src = avatarUrl;
                 image.onload = () => { this.img = image; this.imgLoaded = true; };
             }
-            this.assignPosition();
+            this.assignSpot();
         }
 
-        assignPosition() {
-            const topY = height * 0.25;
-            const bottomY = height * 0.77;
-            this.relY = Math.random();
-            this.y = topY + this.relY * (bottomY - topY);
-            const maxWidthAtY = this.relY * (width * 0.33) + 10;
-            this.x = (width / 2) + (Math.random() - 0.5) * maxWidthAtY * 2;
-            this.radius = 21 + Math.min(15, this.points / 100);
-            this.color = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#8b5cf6'][Math.floor(Math.random() * 6)];
+        assignSpot() {
+            const wallTop = height * 0.28;
+            const wallBottom = height * 0.65;
+            this.x = width * 0.16 + Math.random() * (width * 0.68);
+            this.y = wallTop + Math.random() * (wallBottom - wallTop);
+            this.radius = 26 + Math.min(18, this.points / 150);
+
+            // Adaugă pată de vopsea pe zid în spate
+            paintSplatters.push({
+                x: this.x,
+                y: this.y,
+                radius: this.radius + 18,
+                color: this.color,
+                blobs: Array.from({ length: 10 }, () => ({
+                    angle: Math.random() * Math.PI * 2,
+                    dist: this.radius * (0.7 + Math.random() * 0.7),
+                    r: 6 + Math.random() * 12
+                }))
+            });
+            if (paintSplatters.length > 35) paintSplatters.shift();
         }
 
         draw() {
+            this.scale += (this.targetScale - this.scale) * 0.18;
             ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.scale(this.scale, this.scale);
+
+            // Pata de vopsea / explozie din spatele profilului
+            ctx.fillStyle = this.color;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 18;
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius + 5, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(253, 224, 71, 0.4)';
+            ctx.arc(0, 0, this.radius + 8, 0, Math.PI * 2);
             ctx.fill();
 
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y - this.radius);
-            ctx.lineTo(this.x, this.y - this.radius - 10);
-            ctx.strokeStyle = '#fde047';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            for (let i = 0; i < 8; i++) {
+                const ang = (i / 8) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.arc(Math.cos(ang) * (this.radius + 7), Math.sin(ang) * (this.radius + 7), 8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.shadowBlur = 0;
 
+            // Poza de profil circulară
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
             ctx.closePath();
             ctx.save();
             ctx.clip();
 
             if (this.imgLoaded && this.img) {
-                ctx.drawImage(this.img, this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2);
+                ctx.drawImage(this.img, -this.radius, -this.radius, this.radius * 2, this.radius * 2);
             } else {
-                ctx.fillStyle = this.color;
+                ctx.fillStyle = '#0f172a';
                 ctx.fill();
                 ctx.fillStyle = '#fff';
-                ctx.font = `bold ${Math.max(11, this.radius * 0.7)}px sans-serif`;
+                ctx.font = `bold ${Math.max(13, this.radius * 0.65)}px sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(this.nickname.substring(0, 2).toUpperCase(), this.x, this.y);
+                ctx.fillText(this.nickname.substring(0, 2).toUpperCase(), 0, 0);
             }
-
-            const specular = ctx.createRadialGradient(
-                this.x - this.radius * 0.35, this.y - this.radius * 0.35, 2,
-                this.x - this.radius * 0.35, this.y - this.radius * 0.35, this.radius * 0.9
-            );
-            specular.addColorStop(0, 'rgba(255, 255, 255, 0.65)');
-            specular.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
-            specular.addColorStop(1, 'rgba(0, 0, 0, 0.4)');
-            ctx.fillStyle = specular;
-            ctx.fill();
             ctx.restore();
 
+            // Contur alb strălucitor
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.strokeStyle = '#fde047';
-            ctx.lineWidth = 2.5;
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
             ctx.stroke();
 
-            ctx.fillStyle = '#ffffff';
+            // Etichetă nume stil joc (@Nume)
+            const label = '@' + this.nickname.substring(0, 11);
             ctx.font = 'bold 11px sans-serif';
+            const textW = ctx.measureText(label).width + 12;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.82)';
+            ctx.beginPath();
+            ctx.roundRect(-textW / 2, this.radius + 5, textW, 18, 6);
+            ctx.fill();
+
+            ctx.fillStyle = '#fde047';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0,0,0,0.95)';
-            ctx.shadowBlur = 5;
-            ctx.fillText(this.nickname.substring(0, 9), this.x, this.y + this.radius + 13);
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, 0, this.radius + 14);
+
             ctx.restore();
         }
     }
 
-    function drawRealisticTree() {
-        const cx = width / 2;
-        const time = Date.now() * 0.003;
+    // --- ARMA FUTURISTĂ / SPRAY-UL DIN PARTEA DE JOS ---
+    let gunTargetX = width / 2;
+    let gunTargetY = height * 0.45;
+    let gunRecoil = 0;
 
-        // Steaua din vârf
-        ctx.save();
-        ctx.shadowColor = '#fde047';
-        ctx.shadowBlur = 35 + Math.sin(time * 2) * 15;
-        ctx.font = '48px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('⭐', cx, height * 0.15);
-        ctx.restore();
-
-        // Trunchi brad
-        ctx.fillStyle = '#421d07';
-        ctx.beginPath();
-        ctx.roundRect(cx - 20, height * 0.76, 40, 45, 6);
-        ctx.fill();
-
-        // Cadouri luxuriante jos
-        const gifts = [
-            {x: cx - 65, y: height * 0.82, w: 42, h: 34, col: '#dc2626', bow: '#fde047'},
-            {x: cx - 22, y: height * 0.80, w: 48, h: 40, col: '#f59e0b', bow: '#ffffff'},
-            {x: cx + 22, y: height * 0.81, w: 40, h: 35, col: '#2563eb', bow: '#fde047'},
-            {x: cx + 65, y: height * 0.83, w: 36, h: 30, col: '#16a34a', bow: '#dc2626'}
-        ];
-        gifts.forEach(g => {
-            ctx.fillStyle = g.col;
-            ctx.fillRect(g.x - g.w/2, g.y, g.w, g.h);
-            ctx.fillStyle = g.bow;
-            ctx.fillRect(g.x - 4, g.y, 8, g.h);
-            ctx.fillRect(g.x - g.w/2, g.y + g.h/2 - 4, g.w, 8);
-        });
-
-        // Bradul bogat
-        const levels = [
-            { top: height * 0.19, mid: height * 0.32, bottom: height * 0.44, w: width * 0.27, col1: '#022c22', col2: '#065f46', col3: '#047857' },
-            { top: height * 0.40, mid: height * 0.51, bottom: height * 0.62, w: width * 0.37, col1: '#064e3b', col2: '#059669', col3: '#047857' },
-            { top: height * 0.58, mid: height * 0.68, bottom: height * 0.78, w: width * 0.47, col1: '#022c22', col2: '#047857', col3: '#065f46' }
-        ];
-
-        levels.forEach((lvl) => {
+    function drawWeaponAndBeams() {
+        // Razele de vopsea/laser trase spre ținte
+        for (let i = beams.length - 1; i >= 0; i--) {
+            const b = beams[i];
             ctx.save();
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-            ctx.shadowBlur = 18;
+            ctx.strokeStyle = b.color;
+            ctx.lineWidth = b.life * 14;
+            ctx.lineCap = 'round';
+            ctx.shadowColor = b.color;
+            ctx.shadowBlur = 20;
+            ctx.globalAlpha = b.life;
             ctx.beginPath();
-            ctx.moveTo(cx, lvl.top);
-            ctx.bezierCurveTo(cx + lvl.w * 0.5, lvl.mid, cx + lvl.w, lvl.bottom, cx + lvl.w * 0.95, lvl.bottom);
-            ctx.lineTo(cx - lvl.w * 0.95, lvl.bottom);
-            ctx.bezierCurveTo(cx - lvl.w, lvl.bottom, cx - lvl.w * 0.5, lvl.mid, cx, lvl.top);
-            ctx.closePath();
+            ctx.moveTo(b.startX, b.startY);
+            ctx.lineTo(b.endX, b.endY);
+            ctx.stroke();
 
-            const grad = ctx.createLinearGradient(cx - lvl.w, 0, cx + lvl.w, 0);
-            grad.addColorStop(0, lvl.col1);
-            grad.addColorStop(0.4, lvl.col2);
-            grad.addColorStop(1, lvl.col3);
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.strokeStyle = '#fde047';
-            ctx.lineWidth = 3;
+            // Miez alb luminos al razei
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = b.life * 5;
             ctx.stroke();
             ctx.restore();
+
+            b.life -= 0.06;
+            if (b.life <= 0) beams.splice(i, 1);
+        }
+
+        // Poziția armei în stânga-jos (exact ca în videoclip)
+        const baseX = width * 0.22;
+        const baseY = height * 0.96;
+        const angle = Math.atan2(gunTargetY - baseY, gunTargetX - baseX);
+
+        gunRecoil *= 0.82;
+
+        ctx.save();
+        ctx.translate(baseX, baseY);
+        ctx.rotate(angle);
+        ctx.translate(-gunRecoil, 0);
+
+        // Corpul armei neon roz/mov/metalic
+        const gunGrad = ctx.createLinearGradient(0, -24, 150, 24);
+        gunGrad.addColorStop(0, '#1e293b');
+        gunGrad.addColorStop(0.5, '#ec4899');
+        gunGrad.addColorStop(1, '#8b5cf6');
+        ctx.fillStyle = gunGrad;
+        ctx.beginPath();
+        ctx.roundRect(0, -22, 145, 44, 12);
+        ctx.fill();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Țeava armei
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(140, -12, 24, 24);
+        ctx.fillStyle = '#00f0ff';
+        ctx.fillRect(160, -9, 6, 18);
+
+        // Detalii mecanice pe armă
+        ctx.fillStyle = '#fde047';
+        ctx.fillRect(35, -14, 55, 8);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(45, 6, 65, 6);
+
+        ctx.restore();
+    }
+
+    function fireAtTarget(target) {
+        gunTargetX = target.x;
+        gunTargetY = target.y;
+        gunRecoil = 18;
+
+        const baseX = width * 0.22;
+        const baseY = height * 0.96;
+        const angle = Math.atan2(gunTargetY - baseY, gunTargetX - baseX);
+        const muzzleX = baseX + Math.cos(angle) * 155;
+        const muzzleY = baseY + Math.sin(angle) * 155;
+
+        beams.push({
+            startX: muzzleX,
+            startY: muzzleY,
+            endX: target.x,
+            endY: target.y,
+            color: target.color,
+            life: 1.0
         });
 
-        // Ghirlande luminoase
-        const lights = [
-            {x: cx, y: height * 0.27}, {x: cx - 30, y: height * 0.42}, {x: cx + 35, y: height * 0.40},
-            {x: cx - 60, y: height * 0.56}, {x: cx + 55, y: height * 0.54}, {x: cx, y: height * 0.50},
-            {x: cx - 85, y: height * 0.69}, {x: cx + 80, y: height * 0.67}, {x: cx - 25, y: height * 0.63}
-        ];
-        lights.forEach((lt, idx) => {
-            ctx.beginPath();
-            ctx.arc(lt.x, lt.y, 6, 0, Math.PI * 2);
-            ctx.fillStyle = (idx % 2 === 0 && Math.sin(time * 3 + idx) > 0) ? '#fde047' : '#ef4444';
-            ctx.shadowColor = ctx.fillStyle;
-            ctx.shadowBlur = 12;
-            ctx.fill();
-        });
+        playLaserOrSpraySound();
     }
+
+    // Trage automat când atingi ecranul pe o țintă sau oriunde pe zid
+    canvas.addEventListener('pointerdown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        let hit = targets.find(t => Math.hypot(t.x - clickX, t.y - clickY) <= t.radius + 20);
+        if (!hit && targets.length > 0) {
+            hit = targets[Math.floor(Math.random() * targets.length)];
+        }
+        if (hit) {
+            hit.scale = 1.35;
+            fireAtTarget(hit);
+        }
+    });
 
     function animate() {
         ctx.clearRect(0, 0, width, height);
-        ctx.fillStyle = '#ffffff';
-        snowflakes.forEach(sf => {
-            ctx.globalAlpha = sf.opacity;
-            ctx.beginPath();
-            ctx.arc(sf.x, sf.y, sf.radius, 0, Math.PI * 2);
-            ctx.fill();
-            sf.y += sf.speed;
-            if (sf.y > height) sf.y = 0;
-        });
-        ctx.globalAlpha = 1.0;
-
-        drawRealisticTree();
-        ornaments.forEach(o => o.draw());
+        drawPrisonEnvironment();
+        targets.forEach(t => t.draw());
+        drawWeaponAndBeams();
         requestAnimationFrame(animate);
     }
 
-    socket.on('tree-action', (data) => {
-        addOrUpdateOrnament(data.userId, data.nickname, data.avatar, data.points);
+    // --- EVENIMENTE TIKTOK LIVE ---
+    const greetedUsers = new Set();
+
+    socket.on('wall-action', (data) => {
+        handleViewerInteraction(data.userId, data.nickname, data.avatar, data.points, data.type);
     });
 
     socket.on('status-update', (data) => {
@@ -399,23 +581,44 @@
         if (data.connected) {
             st.style.color = '#4ade80';
             st.textContent = `🟢 Conectat la @${data.username}`;
+            speakRomanian(`Conectat la live-ul lui ${data.username}. Bun venit tuturor!`);
         } else {
             st.style.color = '#fbbf24';
             st.textContent = `🟡 ${data.error}`;
         }
     });
 
-    function addOrUpdateOrnament(userId, nickname, avatar, pts) {
-        let existing = ornaments.find(o => o.userId === userId);
+    function handleViewerInteraction(userId, nickname, avatar, pts, type) {
+        let existing = targets.find(t => t.userId === userId);
         if (existing) {
             existing.points += pts;
+            existing.radius = Math.min(48, existing.radius + 3);
+            existing.scale = 1.3;
+            fireAtTarget(existing);
         } else {
-            if (ornaments.length >= maxOrnaments) ornaments.shift();
-            ornaments.push(new Ornament(userId, nickname, avatar, pts));
+            if (targets.length >= maxTargets) targets.shift();
+            const newTarget = new WallTarget(userId, nickname, avatar, pts);
+            targets.push(newTarget);
+            fireAtTarget(newTarget);
+        }
+
+        // Vorbește în română când intră cineva nou sau trimite cadou
+        if (type === 'gift') {
+            speakRomanian(`Mulțumim pentru cadou, ${nickname}!`);
+        } else if (!greetedUsers.has(userId)) {
+            greetedUsers.add(userId);
+            const salutari = [
+                `Bună, ${nickname}! Bun venit pe live!`,
+                `Salutare, ${nickname}! Bine ai venit!`,
+                `Hello, ${nickname}! Bun venit pe zid!`
+            ];
+            const mesaj = salutari[Math.floor(Math.random() * salutari.length)];
+            speakRomanian(mesaj);
         }
     }
 
     function connectTikTok() {
+        unlockAudio();
         const user = document.getElementById('username').value.trim();
         if (!user) return;
         document.getElementById('status').textContent = `Se conectează la @${user}...`;
@@ -426,38 +629,27 @@
         document.getElementById('controls').classList.toggle('hidden');
     }
 
-    let musicPlaying = false;
-    function toggleMusic() {
-        const audio = document.getElementById('festive-music');
-        const btn = document.getElementById('music-btn');
-        if (musicPlaying) {
-            audio.pause();
-            musicPlaying = false;
-            btn.textContent = '🎵 Pornește Colinde';
-            btn.style.background = '#8b5cf6';
-        } else {
-            audio.play().then(() => {
-                musicPlaying = true;
-                btn.textContent = '🔇 Oprește Colinde';
-                btn.style.background = '#ef4444';
-            }).catch(e => {
-                alert("Atinge ecranul o dată, apoi apasă din nou pe colinde!");
-            });
-        }
+    const demoNames = ["Andrei", "Maria", "Elena", "Denis", "Ioana", "Vlad", "Bianca", "Cristi", "Alex", "Raluca"];
+    function testViewer() {
+        unlockAudio();
+        const name = demoNames[Math.floor(Math.random() * demoNames.length)];
+        handleViewerInteraction('demo_' + Math.random(), name, null, 25, 'member');
     }
 
-    const sampleNames = ["Andrei", "Maria", "Alex", "Elena", "Denis", "Ioana", "Vlad", "Bianca", "Cristi", "Teo"];
-    function spawnOrnaments(count) {
-        for (let i = 0; i < count; i++) {
-            const name = sampleNames[Math.floor(Math.random() * sampleNames.length)] + Math.floor(Math.random()*99);
-            addOrUpdateOrnament('test_' + Math.random(), name, null, Math.floor(Math.random() * 250) + 30);
-        }
-    }
-    function spawnGiantGift() {
-        addOrUpdateOrnament('vip_gift', '🎅 Moș Crăciun', null, 2000);
+    function testGift() {
+        unlockAudio();
+        const name = demoNames[Math.floor(Math.random() * demoNames.length)];
+        handleViewerInteraction('vip_' + Math.random(), name, null, 500, 'gift');
     }
 
-    spawnOrnaments(9);
+    // Populare inițială cu 3 spectatori de exemplu
+    setTimeout(() => {
+        ['Andrei', 'Maria', 'Alex'].forEach(n => {
+            const t = new WallTarget('init_' + n, n, null, 30);
+            targets.push(t);
+        });
+    }, 300);
+
     animate();
 </script>
 </body>
