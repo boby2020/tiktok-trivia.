@@ -26,7 +26,7 @@ io.on('connection', (socket) => {
         }
 
         currentUsername = cleanUser;
-        console.log(`Se încearcă conectarea la live-ul: @${cleanUser}`);
+        console.log(`Conectare la live-ul: @${cleanUser}`);
 
         tiktokConnection = new WebcastPushConnection(cleanUser, {
             processInitialData: true,
@@ -38,61 +38,62 @@ io.on('connection', (socket) => {
 
         tiktokConnection.connect()
             .then(state => {
-                console.log(`Conectat cu succes la camera roomID: ${state.roomId}`);
+                console.log(`Conectat cu succes la roomID: ${state.roomId}`);
                 io.emit('status-update', { connected: true, username: cleanUser });
             })
             .catch(err => {
                 console.error('Eroare conexiune TikTok:', err);
                 io.emit('status-update', { 
                     connected: false, 
-                    error: 'Conexiune blocată de TikTok. Folosește butoanele de test sau reîncearcă.' 
+                    error: 'Eroare conexiune TikTok. Verifică dacă ești LIVE sau folosește testele.' 
                 });
             });
 
-        // Eveniment: Spectator care intră în live
+        // Spectator nou intrat în live
         tiktokConnection.on('member', (data) => {
-            io.emit('tree-action', {
+            io.emit('wall-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: 15,
+                points: 20,
                 type: 'member'
             });
         });
 
-        // Eveniment: Mesaj în chat
+        // Mesaj în chat
         tiktokConnection.on('chat', (data) => {
-            io.emit('tree-action', {
+            io.emit('wall-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: 25,
+                points: 30,
                 type: 'chat'
             });
         });
 
-        // Eveniment: Like-uri (Tap-Tap)
+        // Like-uri (Tap-Tap)
         tiktokConnection.on('like', (data) => {
             const count = data.likeCount || 1;
-            io.emit('tree-action', {
+            io.emit('wall-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: count * 3,
+                points: count * 5,
                 type: 'like'
             });
         });
 
-        // Eveniment: Cadouri trimise
+        // Cadouri trimise
         tiktokConnection.on('gift', (data) => {
             if (data.giftType === 1 && !data.repeatEnd) return;
             const diamonds = (data.diamondCount || 1) * (data.repeatCount || 1);
-            io.emit('tree-action', {
+            io.emit('wall-action', {
                 userId: data.uniqueId,
                 nickname: data.nickname || data.uniqueId,
                 avatar: data.profilePictureUrl,
-                points: diamonds * 80,
-                type: 'gift'
+                points: diamonds * 100,
+                type: 'gift',
+                giftName: data.giftName
             });
         });
     });
